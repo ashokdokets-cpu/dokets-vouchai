@@ -1,0 +1,41 @@
+@echo off
+echo ============================================
+echo    Starting VouchAI Development Servers
+echo ============================================
+echo.
+
+:: Start API Server
+echo Starting API Server on port 3001...
+start "VouchAI API" cmd /k "cd packages\api && npm run dev"
+
+:: Wait for API to start
+timeout /t 3 /nobreak >nul
+
+:: Start Web App
+echo Starting Web App on port 3000...
+start "VouchAI Web" cmd /k "cd packages\web && npm run dev"
+
+:: Wait for Web to start
+timeout /t 3 /nobreak >nul
+
+:: Start WhatsApp Bot
+echo Starting WhatsApp Bot...
+start "VouchAI Bot" cmd /k "cd packages\whatsapp-bot && npm run dev"
+
+:: Start AI Engine
+echo Starting AI Engine on port 8000...
+start "VouchAI AI" cmd /k "cd packages\ai-engine && python -m uvicorn main:app --reload --port 8000"
+
+echo.
+echo ============================================
+echo    All servers started!
+echo ============================================
+echo.
+echo 📱 Web App: http://localhost:3000
+echo 🔌 API: http://localhost:3001
+echo 🤖 AI Engine: http://localhost:8000
+echo 📞 WhatsApp Bot: Running
+echo.
+echo Close individual windows or press Ctrl+C in each to stop
+echo.
+pause
