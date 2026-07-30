@@ -1,0 +1,80 @@
+// ============================================
+// VouchAI WhatsApp Bot Server
+// ============================================
+
+import express from 'express';
+import { vouchAgent } from './vouch-agent';
+
+const app = express();
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', service: 'VouchAI WhatsApp Bot' });
+});
+
+// Webhook for incoming WhatsApp messages
+app.post('/webhook/whatsapp', async (req, res) => {
+  try {
+    const { From, Body, MediaUrl0, NumMedia } = req.body;
+    
+    console.log(`📱 Message from ${From}: ${Body || '[Media]'}`);
+    
+    // Process message through VouchAgent
+    await vouchAgent.handleIncomingMessage(
+      From.replace('whatsapp:', ''),
+      Body || '',
+      NumMedia > 0 ? MediaUrl0 : undefined
+    );
+    
+    res.send('<Response></Response>');
+  } catch (error) {
+    console.error('Webhook error:', error);
+    res.status(500).send('Error processing message');
+  }
+});
+
+// API endpoint to send message programmatically
+app.post('/api/send-message', async (req, res) => {
+  try {
+    const { phone, message } = req.body;
+    await vouchAgent.sendMessage(phone, message);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to send message' });
+  }
+});
+
+// API to trigger deadline reminders
+app.post('/api/reminders/check', async (req, res) => {
+  try {
+    // Check for contracts nearing deadline and send reminders
+    const response = await fetch(`${process.env.API_URL}/api/contracts/upcoming-deadlines`);
+    const contracts = await response.json();
+    
+    for (const contract of contracts) {
+      await vouchAgent.sendDeadlineReminder(contract.id);
+    }
+    
+    res.json({ success: true, remindersSent: contracts.length });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to send reminders' });
+  }
+});
+
+const PORT = process.env.PORT || 3002;
+
+app.listen(PORT, () => {
+  console.log(`
+  ============================================
+    📱 VouchAI WhatsApp Bot Running
+  ============================================
+    Port: ${PORT}
+    Webhook: http://localhost:${PORT}/webhook/whatsapp
+    Health: http://localhost:${PORT}/health
+  ============================================
+  `);
+});
+
+export default app;

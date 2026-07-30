@@ -1,0 +1,835 @@
+// ============================================
+// VouchAI - WhatsApp-First Micro-Contract Engine
+// The core agent that transforms casual chats into protected deals
+// ============================================
+
+import twilio from 'twilio';
+import OpenAI from 'openai';
+import axios from 'axios';
+import { generateVouchId, calculatePlatformFee, formatCurrency } from '@vouchai/shared';
+
+// Initialize clients
+const twilioClient = twilio(
+  process.env.TWILIO_ACCOUNT_SID!,
+  process.env.TWILIO_AUTH_TOKEN!
+);
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY!
+});
+
+// ============================================
+// Types
+// ============================================
+
+interface VouchContract {
+  vouchId: string;
+  clientPhone: string;
+  clientName: string;
+  providerPhone: string;
+  providerName: string;
+  workDescription: string;
+  category: string;
+  amount: number;
+  currency: string;
+  upfrontAmount: number;
+  finalAmount: number;
+  deadline: string;
+  location: string;
+  language: string;
+  status: 'DRAFT' | 'SENT' | 'ACCEPTED' | 'IN_PROGRESS' | 'VERIFICATION_PENDING' | 'COMPLETED' | 'DISPUTED';
+  milestones: Milestone[];
+  createdAt: Date;
+}
+
+interface Milestone {
+  title: string;
+  amount: number;
+  percentage: number;
+  status: 'PENDING' | 'COMPLETED' | 'VERIFIED';
+  proofUrl?: string;
+}
+
+interface ConversationState {
+  phone: string;
+  state: 'INITIAL' | 'CREATING_CONTRACT' | 'AWAITING_ACCEPTANCE' | 'AWAITING_PROOF' | 'MEDIATION' | 'SUPPORT';
+  context: any;
+}
+
+// ============================================
+// Main VouchAgent Class
+// ============================================
+
+export class VouchAgent {
+  private conversationStates: Map<string, ConversationState> = new Map();
+  
+  /**
+   * Main entry point - handles all incoming WhatsApp messages
+   */
+  async handleIncomingMessage(from: string, messageBody: string, mediaUrl?: string) {
+    try {
+      // Get or create conversation state
+      let state = this.conversationStates.get(from) || {
+        phone: from,
+        state: 'INITIAL',
+        context: {}
+      };
+
+      // Check for media (photos, videos, voice notes)
+      if (mediaUrl) {
+        return await this.handleMediaMessage(from, mediaUrl, state);
+      }
+
+      // Handle text commands
+      const msg = messageBody.toLowerCase().trim();
+      
+      // Route based on current state
+      switch (state.state) {
+        case 'INITIAL':
+          return await this.handleInitialState(from, msg, state);
+        
+        case 'CREATING_CONTRACT':
+          return await this.handleContractCreation(from, msg, state);
+        
+        case 'AWAITING_ACCEPTANCE':
+          return await this.handleAcceptanceResponse(from, msg, state);
+        
+        case 'AWAITING_PROOF':
+          return await this.handleProofSubmission(from, msg, state);
+        
+        case 'MEDIATION':
+          return await this.handleMediation(from, msg, state);
+        
+        default:
+          return await this.handleInitialState(from, msg, state);
+      }
+    } catch (error) {
+      console.error('Error handling message:', error);
+      await this.sendMessage(from, "🙈 Oops! Something went wrong. Please try again or type *HELP* for assistance.");
+    }
+  }
+
+  /**
+   * Handle initial state - new users or main menu
+   */
+  private async handleInitialState(from: string, msg: string, state: ConversationState) {
+    // Check if user exists in our system
+    const user = await this.getUser(from);
+    
+    if (msg === 'hi' || msg === 'hello' || msg === 'help' || msg === 'menu') {
+      const welcomeMsg = user 
+        ? this.getMainMenu(user.name, user.vouchScore)
+        : this.getWelcomeMessage();
+      
+      await this.sendMessage(from, welcomeMsg);
+      return;
+    }
+
+    // Command routing
+    if (msg.includes('create') || msg.includes('new contract') || msg.includes('hire')) {
+      return await this.startContractCreation(from, state);
+    }
+    
+    if (msg.includes('accept') || msg.includes('job')) {
+      return await this.checkPendingContracts(from);
+    }
+    
+    if (msg.includes('status') || msg.includes('progress')) {
+      return await this.checkContractStatus(from);
+    }
+    
+    if (msg.includes('score') || msg.includes('rating')) {
+      return await this.showVouchScore(from);
+    }
+    
+    if (msg.includes('dispute') || msg.includes('problem') || msg.includes('issue')) {
+      return await this.startDispute(from, state);
+    }
+    
+    if (msg.includes('premium') || msg.includes('upgrade')) {
+      return await this.showPremiumOptions(from);
+    }
+    
+    if (msg.includes('refer') || msg.includes('invite')) {
+      return await this.showReferralInfo(from);
+    }
+
+    // Default: Show menu
+    await this.sendMessage(from, this.getMainMenu(user?.name || 'there', user?.vouchScore || 100));
+  }
+
+  /**
+   * 🎯 STEP 1: Start Contract Creation - "The Snap"
+   * User sends voice note or text describing work needed
+   */
+  async startContractCreation(from: string, state: ConversationState) {
+    state.state = 'CREATING_CONTRACT';
+    state.context = { step: 'describe_work' };
+    this.conversationStates.set(from, state);
+
+    const message = `📝 *Let's Create Your Contract!*
+
+I'll help you create an AI-protected agreement. Just describe what you need in a simple message.
+
+*Example:*
+"Paint my living room blue by Friday for ₹15,000. Ramesh is doing the work."
+
+*Or send a voice note* 🎤 describing:
+• What work needs to be done
+• Who will do it (name and phone)
+• How much you'll pay
+• When it should be done
+
+Just type naturally - I'll figure out the details! 🤖`;
+
+    await this.sendMessage(from, message);
+  }
+
+  /**
+   * 🎯 STEP 2: Process Work Description & Extract Contract
+   */
+  private async handleContractCreation(from: string, msg: string, state: ConversationState) {
+    if (state.context?.step === 'describe_work') {
+      // Extract contract details using AI
+      const contract = await this.extractContractFromMessage(msg, from);
+      
+      if (!contract) {
+        await this.sendMessage(from, 
+          "🤔 I couldn't quite understand the details. Can you please include:\n\n" +
+          "• What work? (e.g., paint room)\n" +
+          "• How much? (e.g., ₹15,000)\n" +
+          "• By when? (e.g., Friday)\n" +
+          "• Who? (name or phone number)\n\n" +
+          "Try again or type *EXAMPLE* to see a sample."
+        );
+        return;
+      }
+
+      // Save contract draft
+      state.context.contract = contract;
+      state.context.step = 'confirm_details';
+      this.conversationStates.set(from, state);
+
+      // Show extracted details for confirmation
+      const confirmMsg = this.formatContractConfirmation(contract);
+      await this.sendMessage(from, confirmMsg);
+    }
+    else if (state.context?.step === 'confirm_details') {
+      if (msg === 'yes' || msg === 'confirm' || msg === 'ok' || msg === '✅') {
+        // Create visual contract and send to provider
+        const contract = state.context.contract;
+        contract.status = 'SENT';
+        
+        // Generate visual contract
+        const visualUrl = await this.generateVisualContract(contract);
+        contract.visualUrl = visualUrl;
+        
+        // Send to provider
+        await this.sendContractToProvider(contract);
+        
+        // Confirm to client
+        await this.sendMessage(from, 
+          `✅ *Contract Created!*\n\n` +
+          `Your agreement has been sent to ${contract.providerName}.\n\n` +
+          `🛡️ VouchAI will:\n` +
+          `• Hold payment securely\n` +
+          `• Remind provider of deadline\n` +
+          `• Verify work completion\n` +
+          `• Release payment automatically\n\n` +
+          `You'll be notified when they accept! 📱\n\n` +
+          `Contract ID: *${contract.vouchId}*`
+        );
+        
+        // Reset state
+        state.state = 'INITIAL';
+        state.context = {};
+        this.conversationStates.set(from, state);
+      }
+      else if (msg === 'no' || msg === 'edit' || msg === 'change') {
+        await this.startContractCreation(from, state);
+      }
+      else {
+        await this.sendMessage(from, 
+          "Please reply:\n" +
+          "✅ *YES* to confirm and send\n" +
+          "✏️ *EDIT* to make changes"
+        );
+      }
+    }
+  }
+
+  /**
+   * 🎯 STEP 3: Extract Contract from Natural Language using AI
+   */
+  private async extractContractFromMessage(message: string, clientPhone: string): Promise<VouchContract | null> {
+    try {
+      const prompt = `You are VouchAI, an AI agent for the informal economy.
+Extract a micro-contract from this casual message. The person is hiring someone for work.
+
+Message: "${message}"
+
+Extract these details in JSON format:
+{
+  "workDescription": "clear description of work to be done",
+  "category": "category like painting, plumbing, tutoring, etc.",
+  "amount": total amount as number,
+  "currency": "INR, USD, BRL, etc. - detect from context or use INR for India",
+  "upfrontAmount": advance payment if mentioned (0 if not mentioned),
+  "finalAmount": remaining amount after completion,
+  "deadline": "date/time when work should be done",
+  "providerName": "name of person doing the work",
+  "providerPhone": "phone number if mentioned (with country code)",
+  "location": "where work happens",
+  "milestones": [
+    {"title": "milestone description", "percentage": percentage of total}
+  ]
+}
+
+Important:
+- Be generous in interpretation - this is casual speech
+- If no upfront mentioned, assume 20-30% is typical
+- If no deadline mentioned, assume 1 week
+- Detect language and currency from context
+- Make it friendly, not legal`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.3,
+      });
+
+      const extracted = JSON.parse(response.choices[0].message.content || '{}');
+      
+      if (!extracted.workDescription || !extracted.amount) {
+        return null;
+      }
+
+      // Create contract object
+      const contract: VouchContract = {
+        vouchId: generateVouchId(),
+        clientPhone: clientPhone,
+        clientName: await this.getUserName(clientPhone) || 'Client',
+        providerPhone: extracted.providerPhone || '',
+        providerName: extracted.providerName || 'Service Provider',
+        workDescription: extracted.workDescription,
+        category: extracted.category || 'general',
+        amount: extracted.amount,
+        currency: extracted.currency || 'INR',
+        upfrontAmount: extracted.upfrontAmount || Math.round(extracted.amount * 0.2),
+        finalAmount: extracted.finalAmount || (extracted.amount - (extracted.upfrontAmount || 0)),
+        deadline: extracted.deadline || '1 week',
+        location: extracted.location || 'To be decided',
+        language: extracted.language || 'en',
+        status: 'DRAFT',
+        milestones: extracted.milestones || [
+          { title: 'Work Started', amount: extracted.upfrontAmount || Math.round(extracted.amount * 0.2), percentage: 20, status: 'PENDING' },
+          { title: 'Work Completed', amount: extracted.finalAmount || Math.round(extracted.amount * 0.8), percentage: 80, status: 'PENDING' }
+        ],
+        createdAt: new Date()
+      };
+
+      return contract;
+    } catch (error) {
+      console.error('Contract extraction error:', error);
+      return null;
+    }
+  }
+
+  /**
+   * 🎯 STEP 4: Format contract for confirmation
+   */
+  private formatContractConfirmation(contract: VouchContract): string {
+    const fee = calculatePlatformFee(contract.amount, contract.currency as any);
+    
+    return `📋 *Please Confirm Your Agreement*
+
+🤝 *Work:* ${contract.workDescription}
+👤 *Provider:* ${contract.providerName}
+💰 *Total:* ${formatCurrency(contract.amount, contract.currency as any)}
+📅 *Deadline:* ${contract.deadline}
+📍 *Location:* ${contract.location}
+
+*Payment Split:*
+• Upfront: ${formatCurrency(contract.upfrontAmount, contract.currency as any)} (now)
+• Final: ${formatCurrency(contract.finalAmount, contract.currency as any)} (after completion)
+
+🛡️ *VouchAI Protection:*
+• 1% Platform Fee: ${formatCurrency(fee, contract.currency as any)}
+• Payment held securely in escrow
+• AI verification of work
+• Free dispute resolution
+
+Is this correct? Reply:
+✅ *YES* to confirm and send to provider
+✏️ *EDIT* to make changes`;
+  }
+
+  /**
+   * 🎯 STEP 5: Generate Visual Contract (Infographic)
+   */
+  async generateVisualContract(contract: VouchContract): Promise<string> {
+    try {
+      // Call AI engine to generate visual contract
+      const response = await axios.post(`${process.env.API_URL}/api/contracts/visual`, {
+        contract: contract,
+        type: 'whatsapp_infographic'
+      });
+
+      return response.data.visualUrl;
+    } catch (error) {
+      console.error('Visual contract generation error:', error);
+      // Return a placeholder or text-based contract
+      return '';
+    }
+  }
+
+  /**
+   * 🎯 STEP 6: Send Contract to Provider (The Two-Way Vouch)
+   */
+  async sendContractToProvider(contract: VouchContract) {
+    const message = `🤝 *New Work Opportunity!*\n\n` +
+      `${contract.clientName} wants to hire you via VouchAI!\n\n` +
+      `📋 *Work:* ${contract.workDescription}\n` +
+      `💰 *Payment:* ${formatCurrency(contract.amount, contract.currency as any)}\n` +
+      `📅 *Deadline:* ${contract.deadline}\n\n` +
+      `💵 *You'll Receive:*\n` +
+      `• ${formatCurrency(contract.upfrontAmount, contract.currency as any)} upfront\n` +
+      `• ${formatCurrency(contract.finalAmount, contract.currency as any)} on completion\n\n` +
+      `🛡️ Payment is secured by VouchAI escrow\n\n` +
+      `Reply:\n` +
+      `✅ *ACCEPT* to take this job\n` +
+      `❌ *DECLINE* to pass\n\n` +
+      `Completing this job will boost your Vouch Score! ⭐`;
+
+    if (contract.providerPhone) {
+      await this.sendMessage(contract.providerPhone, message);
+      
+      // Send visual contract if available
+      if (contract.visualUrl) {
+        await twilioClient.messages.create({
+          from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+          to: `whatsapp:${contract.providerPhone}`,
+          mediaUrl: [contract.visualUrl]
+        });
+      }
+    }
+  }
+
+  /**
+   * 🎯 Handle provider's response to contract
+   */
+  private async handleAcceptanceResponse(from: string, msg: string, state: ConversationState) {
+    if (msg === 'accept' || msg === 'yes' || msg === '✅') {
+      const contractId = state.context?.contractId;
+      
+      // Update contract status
+      await this.updateContractStatus(contractId, 'ACCEPTED');
+      
+      await this.sendMessage(from,
+        `🎉 *You Accepted the Job!*\n\n` +
+        `Great decision! Here's what's next:\n\n` +
+        `1️⃣ Client will secure payment in escrow\n` +
+        `2️⃣ You'll receive ${formatCurrency(state.context?.upfrontAmount || 0, state.context?.currency || 'INR')} upfront\n` +
+        `3️⃣ Complete the work by ${state.context?.deadline || 'deadline'}\n` +
+        `4️⃣ Upload proof for AI verification\n` +
+        `5️⃣ Receive final payment automatically!\n\n` +
+        `📅 I'll remind you before the deadline.\n` +
+        `Good luck! 🍀`
+      );
+
+      // Notify client
+      if (state.context?.clientPhone) {
+        await this.sendMessage(state.context.clientPhone,
+          `✅ *Good News!*\n\n` +
+          `${await this.getUserName(from)} has accepted your contract!\n\n` +
+          `Please secure the payment to start the work.\n` +
+          `Reply *PAY* to proceed with payment.`
+        );
+      }
+
+      state.state = 'INITIAL';
+      this.conversationStates.set(from, state);
+    }
+    else if (msg === 'decline' || msg === 'no' || msg === '❌') {
+      await this.sendMessage(from, 
+        "No problem! Maybe next time. 🙏\n\n" +
+        "Your Vouch Score won't be affected."
+      );
+      
+      state.state = 'INITIAL';
+      this.conversationStates.set(from, state);
+    }
+  }
+
+  /**
+   * 🎯 Handle proof submission for work verification
+   */
+  private async handleProofSubmission(from: string, msg: string, state: ConversationState) {
+    if (state.context?.step === 'awaiting_proof') {
+      await this.sendMessage(from,
+        "📸 Please send a photo or video of the completed work.\n\n" +
+        "Tips for good verification:\n" +
+        "• Take clear photos in good light\n" +
+        "• Show the full work area\n" +
+        "• Include before/after comparison if possible"
+      );
+    }
+  }
+
+  /**
+   * 🎯 Handle media messages (photos, videos, voice notes)
+   */
+  private async handleMediaMessage(from: string, mediaUrl: string, state: ConversationState) {
+    const mediaType = this.getMediaType(mediaUrl);
+    
+    if (mediaType === 'voice') {
+      // Transcribe voice note
+      const transcription = await this.transcribeVoice(mediaUrl);
+      return await this.handleIncomingMessage(from, transcription);
+    }
+    
+    if (mediaType === 'photo' || mediaType === 'video') {
+      if (state.state === 'AWAITING_PROOF') {
+        // Verify work completion
+        const verificationResult = await this.verifyWorkCompletion(
+          state.context?.contractId,
+          mediaUrl
+        );
+        
+        if (verificationResult.verified) {
+          await this.sendMessage(from,
+            `✅ *Work Verified!*\n\n` +
+            `AI confirms the work is complete!\n` +
+            `Confidence: ${verificationResult.confidence}%\n\n` +
+            `💰 Your payment of ${formatCurrency(state.context?.amount || 0, state.context?.currency || 'INR')} is being released.\n\n` +
+            `⭐ You earned +10 Vouch Score!\n\n` +
+            `Share your achievement! Type *SCORECARD*`
+          );
+          
+          // Release payment
+          await this.releasePayment(state.context?.contractId);
+        } else {
+          await this.sendMessage(from,
+            `⚠️ *Verification Needed*\n\n` +
+            `AI needs more proof to verify completion.\n\n` +
+            `Please send:\n` +
+            `• More photos from different angles\n` +
+            `• A video walkthrough\n` +
+            `• Close-up of completed work\n\n` +
+            `Or type *MEDIATE* for human review.`
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * 🎯 AI Work Verification
+   */
+  private async verifyWorkCompletion(contractId: string, proofUrl: string): Promise<{ verified: boolean; confidence: number }> {
+    try {
+      // Call AI verification service
+      const response = await axios.post(`${process.env.API_URL}/api/verification/verify`, {
+        contractId,
+        proofUrl
+      });
+
+      return {
+        verified: response.data.verified,
+        confidence: response.data.confidence
+      };
+    } catch (error) {
+      console.error('Verification error:', error);
+      return { verified: false, confidence: 0 };
+    }
+  }
+
+  /**
+   * 🎯 AI Mediation for disputes
+   */
+  private async handleMediation(from: string, msg: string, state: ConversationState) {
+    if (!state.context?.disputeId) {
+      // Start new mediation
+      const contracts = await this.getActiveContracts(from);
+      
+      if (contracts.length === 0) {
+        await this.sendMessage(from, "You don't have any active contracts to dispute.");
+        state.state = 'INITIAL';
+        return;
+      }
+      
+      let contractList = "*Which contract has an issue?*\n\n";
+      contracts.forEach((c: any, i: number) => {
+        contractList += `${i + 1}. ${c.workDescription} (${c.vouchId})\n`;
+      });
+      contractList += "\nReply with the number.";
+      
+      await this.sendMessage(from, contractList);
+      state.context.step = 'select_contract';
+    }
+    else if (state.context?.step === 'describe_issue') {
+      // Process dispute
+      const disputeId = state.context.disputeId;
+      
+      // AI mediation
+      const resolution = await this.aiMediate(disputeId, msg);
+      
+      await this.sendMessage(from,
+        `⚖️ *AI Mediation Result*\n\n` +
+        `After reviewing the evidence:\n\n` +
+        `📋 ${resolution.recommendation}\n\n` +
+        `💰 ${resolution.paymentResolution}\n\n` +
+        `💡 ${resolution.fairnessExplanation}\n\n` +
+        `Both parties can:\n` +
+        `✅ *AGREE* to accept\n` +
+        `🔄 *REVIEW* for human mediation`
+      );
+    }
+  }
+
+  /**
+   * 🎯 AI Mediator
+   */
+  private async aiMediate(disputeId: string, issue: string) {
+    try {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [{
+          role: "system",
+          content: "You are VouchAI, a neutral AI mediator for informal work disputes. Provide fair, culturally-aware resolutions."
+        }, {
+          role: "user",
+          content: `Dispute: ${issue}\n\nProvide a fair resolution considering local customs and common sense. Output JSON with: recommendation, paymentResolution, fairnessExplanation`
+        }],
+        temperature: 0.3,
+      });
+
+      return JSON.parse(response.choices[0].message.content || '{}');
+    } catch (error) {
+      return {
+        recommendation: "Escalate to human mediation",
+        paymentResolution: "Split 50/50",
+        fairnessExplanation: "Insufficient evidence for AI resolution"
+      };
+    }
+  }
+
+  /**
+   * 🎯 Send Vouch Scorecard
+   */
+  async sendVouchScorecard(phone: string) {
+    const user = await this.getUser(phone);
+    if (!user) return;
+
+    const scorecardUrl = await this.generateScorecard(user);
+    
+    const message = `⭐ *Your Vouch Scorecard*\n\n` +
+      `🏆 Score: ${user.vouchScore}/100\n` +
+      `📊 Tier: ${user.tier}\n` +
+      `✅ Completed: ${user.completedContracts} jobs\n` +
+      `📈 Completion Rate: ${user.completionRate}%\n\n` +
+      `Share this to get more jobs! 🚀\n` +
+      `Type *SHARE* to post to your status.`;
+
+    await twilioClient.messages.create({
+      from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+      to: `whatsapp:${phone}`,
+      body: message,
+      mediaUrl: scorecardUrl ? [scorecardUrl] : undefined
+    });
+  }
+
+  /**
+   * 🎯 Send deadline reminder
+   */
+  async sendDeadlineReminder(contractId: string) {
+    const contract = await this.getContract(contractId);
+    if (!contract) return;
+
+    const message = `⏰ *Deadline Reminder!*\n\n` +
+      `Hey ${contract.providerName}! 👋\n\n` +
+      `Your work "${contract.workDescription}" is due ${contract.deadline}.\n\n` +
+      `💡 Remember to:\n` +
+      `• Complete the work\n` +
+      `• Send a photo/video as proof\n` +
+      `• Get paid automatically!\n\n` +
+      `Reply *DONE* when finished and send proof. 📸`;
+
+    await this.sendMessage(contract.providerPhone, message);
+  }
+
+  // ============================================
+  // Helper Methods
+  // ============================================
+
+  private async sendMessage(to: string, body: string) {
+    try {
+      await twilioClient.messages.create({
+        from: `whatsapp:${process.env.TWILIO_WHATSAPP_NUMBER}`,
+        to: `whatsapp:${to}`,
+        body: body
+      });
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  }
+
+  private getWelcomeMessage(): string {
+    return `🎉 *Welcome to VouchAI!* 🤖\n\n` +
+      `I help you create secure work agreements via WhatsApp!\n\n` +
+      `🛡️ *What I do:*\n` +
+      `• Create contracts from your messages\n` +
+      `• Hold payments securely in escrow\n` +
+      `• Verify work completion with AI\n` +
+      `• Resolve disputes fairly\n\n` +
+      `📊 You start with a *100 Vouch Score*!\n\n` +
+      `*Quick Commands:*\n` +
+      `📝 *CREATE* - Make a new contract\n` +
+      `📋 *STATUS* - Check your contracts\n` +
+      `⭐ *SCORE* - View your Vouch Score\n` +
+      `💎 *PREMIUM* - Upgrade your profile\n` +
+      `👥 *REFER* - Invite friends & earn\n\n` +
+      `Just type naturally - I understand casual language! 🗣️`;
+  }
+
+  private getMainMenu(name: string, score: number): string {
+    return `👋 Hey ${name}!\n\n` +
+      `⭐ Your Vouch Score: *${score}/100*\n\n` +
+      `What would you like to do?\n\n` +
+      `📝 *CREATE* contract\n` +
+      `📋 *STATUS* of contracts\n` +
+      `⭐ *SCORE* details\n` +
+      `💎 *PREMIUM* upgrade\n` +
+      `👥 *REFER* friends\n` +
+      `❓ *HELP* for assistance`;
+  }
+
+  private getMediaType(url: string): string {
+    if (url.includes('audio')) return 'voice';
+    if (url.includes('video')) return 'video';
+    if (url.includes('image')) return 'photo';
+    return 'unknown';
+  }
+
+  private async transcribeVoice(audioUrl: string): Promise<string> {
+    try {
+      // Download audio and transcribe
+      const response = await axios.post(`${process.env.API_URL}/api/ai/transcribe`, {
+        audioUrl
+      });
+      return response.data.text;
+    } catch (error) {
+      return '';
+    }
+  }
+
+  private async getUser(phone: string): Promise<any> {
+    try {
+      const response = await axios.get(`${process.env.API_URL}/api/users/${phone}`);
+      return response.data;
+    } catch {
+      return null;
+    }
+  }
+
+  private async getUserName(phone: string): Promise<string> {
+    const user = await this.getUser(phone);
+    return user?.name || 'User';
+  }
+
+  private async getContract(contractId: string): Promise<any> {
+    try {
+      const response = await axios.get(`${process.env.API_URL}/api/contracts/${contractId}`);
+      return response.data;
+    } catch {
+      return null;
+    }
+  }
+
+  private async getActiveContracts(phone: string): Promise<any[]> {
+    try {
+      const response = await axios.get(`${process.env.API_URL}/api/contracts/active/${phone}`);
+      return response.data;
+    } catch {
+      return [];
+    }
+  }
+
+  private async updateContractStatus(contractId: string, status: string): Promise<void> {
+    await axios.put(`${process.env.API_URL}/api/contracts/${contractId}/status`, { status });
+  }
+
+  private async releasePayment(contractId: string): Promise<void> {
+    await axios.post(`${process.env.API_URL}/api/payments/release`, { contractId });
+  }
+
+  private async checkPendingContracts(phone: string): Promise<void> {
+    const contracts = await this.getActiveContracts(phone);
+    if (contracts.length === 0) {
+      await this.sendMessage(phone, "📋 You don't have any pending contracts.");
+      return;
+    }
+    // Show contracts...
+  }
+
+  private async checkContractStatus(phone: string): Promise<void> {
+    await this.sendMessage(phone, "📋 Fetching your contracts...");
+    // Implementation...
+  }
+
+  private async showVouchScore(phone: string): Promise<void> {
+    await this.sendVouchScorecard(phone);
+  }
+
+  private async startDispute(from: string, state: ConversationState): Promise<void> {
+    state.state = 'MEDIATION';
+    state.context = {};
+    this.conversationStates.set(from, state);
+    await this.handleMediation(from, '', state);
+  }
+
+  private async showPremiumOptions(phone: string): Promise<void> {
+    await this.sendMessage(phone,
+      `💎 *VouchAI Premium*\n\n` +
+      `Stand out and earn more!\n\n` +
+      `✨ *Benefits:*\n` +
+      `• ⭐ "Vouch Certified" badge\n` +
+      `• 📈 Appear first in searches\n` +
+      `• 🎨 Custom scorecard design\n` +
+      `• 📊 Advanced analytics\n` +
+      `• 🚀 Early access to jobs\n\n` +
+      `💰 *Only $3/month* or $30/year\n\n` +
+      `Reply *UPGRADE* to activate!`
+    );
+  }
+
+  private async showReferralInfo(phone: string): Promise<void> {
+    const user = await this.getUser(phone);
+    const referralLink = `https://vouchai.com/ref/${user?.referralCode || 'SIGNUP'}`;
+    
+    await this.sendMessage(phone,
+      `👥 *Refer & Earn!*\n\n` +
+      `Share VouchAI with friends and earn rewards!\n\n` +
+      `🎁 *For each friend who joins:*\n` +
+      `• They get $1 bonus\n` +
+      `• You get $0.50 credit\n` +
+      `• +5 Vouch Score points\n\n` +
+      `🔗 Your referral link:\n${referralLink}\n\n` +
+      `Share this link or type *INVITE* to send directly!`
+    );
+  }
+
+  private async generateScorecard(user: any): Promise<string> {
+    try {
+      const response = await axios.post(`${process.env.API_URL}/api/users/scorecard`, {
+        userId: user.id
+      });
+      return response.data.imageUrl;
+    } catch {
+      return '';
+    }
+  }
+}
+
+// Export singleton
+export const vouchAgent = new VouchAgent();
