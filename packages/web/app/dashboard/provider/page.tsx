@@ -184,7 +184,7 @@ export default function ProviderDashboard() {
               </div>
             </motion.div>
           ))}
-          {((activeTab === 'pending' ? pendingContracts : activeTab === 'active' ? activeContracts : completedContracts)).length === 0 && (
+          {(activeTab === 'pending' ? pendingContracts : activeTab === 'active' ? activeContracts : completedContracts).length === 0 && (
             <div className="text-center py-16 bg-white rounded-xl border">
               <div className="text-6xl mb-4">
                 {activeTab === 'pending' ? '🔔' : activeTab === 'active' ? '🔵' : '✅'}
