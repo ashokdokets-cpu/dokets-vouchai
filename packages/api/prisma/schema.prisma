@@ -1,9 +1,10 @@
 generator client {
-  provider = "prisma-client-js"`n  binaryTargets = ["native", "debian-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -21,15 +22,12 @@ model User {
   referralCode  String   @unique
   walletBalance Float    @default(0)
   walletCurrency String  @default("INR")
+  completedContracts Int  @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   
   contractsAsClient  Contract[] @relation("ClientContracts")
   contractsAsProvider Contract[] @relation("ProviderContracts")
-  reviewsGiven       Review[] @relation("Reviewer")
-  reviewsReceived    Review[] @relation("Reviewee")
-  disputesRaised     Dispute[] @relation("DisputeRaiser")
-  disputesAgainst    Dispute[] @relation("DisputeAgainst")
 }
 
 model Contract {
@@ -37,36 +35,22 @@ model Contract {
   vouchId     String   @unique
   title       String
   description String
-  category    String?
   status      String   @default("DRAFT")
   amount      Float
   currency    String   @default("INR")
-  upfrontAmount Float?
-  finalAmount  Float
   clientId    String
   client      User     @relation("ClientContracts", fields: [clientId], references: [id])
   providerId  String?
   provider    User?    @relation("ProviderContracts", fields: [providerId], references: [id])
-  location    String?
-  country     String   @default("IN")
-  language    String   @default("en")
   deadline    DateTime
-  aiGenerated Boolean  @default(false)
-  totalPaid   Float    @default(0)
-  platformFee Float    @default(0)
-  hasInsurance Boolean @default(false)
-  startedAt   DateTime?
-  completedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
   payments    Payment[]
-  reviews     Review[]
-  disputes    Dispute[]
 }
 
 model Payment {
-  id          String @id @default(cuid())
+  id          String   @id @default(cuid())
   contractId  String
   contract    Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
   amount      Float
@@ -79,42 +63,4 @@ model Payment {
   fromUserId  String
   toUserId    String
   createdAt   DateTime @default(now())
-}
-
-model Review {
-  id          String @id @default(cuid())
-  contractId  String
-  contract    Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-  reviewerId  String
-  reviewer    User @relation("Reviewer", fields: [reviewerId], references: [id])
-  revieweeId  String
-  reviewee    User @relation("Reviewee", fields: [revieweeId], references: [id])
-  rating      Int
-  comment     String?
-  createdAt   DateTime @default(now())
-}
-
-model Dispute {
-  id          String @id @default(cuid())
-  contractId  String
-  contract    Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-  raisedById  String
-  raisedBy    User @relation("DisputeRaiser", fields: [raisedById], references: [id])
-  againstId   String
-  against     User @relation("DisputeAgainst", fields: [againstId], references: [id])
-  description String
-  status      String @default("OPEN")
-  resolvedAt  DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model WhatsAppSession {
-  id          String @id @default(cuid())
-  phone       String @unique
-  state       String
-  language    String @default("en")
-  lastMessage DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }
