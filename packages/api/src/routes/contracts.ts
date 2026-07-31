@@ -13,7 +13,7 @@ router.post('/', async (req: Request, res: Response) => {
       if (!provider) {
         provider = await prisma.user.create({
           data: {
-            phone: providerPhone,
+            phone: providerPhone.startsWith('+') ? providerPhone : '+' + providerPhone,
             name: 'User' + providerPhone.slice(-4),
             country: country || 'IN',
             language: language || 'en',
@@ -28,7 +28,7 @@ router.post('/', async (req: Request, res: Response) => {
     const contract = await prisma.contract.create({
       data: {
         vouchId, title, description,
-        category: category || 'general',
+        // category field not in database yet
         amount, currency: currency || 'INR',
         upfrontAmount: Math.round(amount * 0.2),
         finalAmount: amount,
