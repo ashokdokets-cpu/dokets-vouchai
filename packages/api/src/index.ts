@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Twilio client
-const tc = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+const tc = process.env.TWILIO_ACCOUNT_SID ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN) : null;
 const FROM = 'whatsapp:' + (process.env.TWILIO_WHATSAPP_NUMBER || '+12232264859');
 const API_URL = process.env.API_URL || 'https://dokets-vouchai.onrender.com/api';
 
@@ -134,7 +134,9 @@ app.post('/webhook', async (req, res) => {
   }
   else { reply = 'VouchAI Bot\n\nCREATE | STATUS | SCORE | HELP'; }
 
-  await tc.messages.create({ from: FROM, to: From, body: reply });
+  if (tc) {
+  await tc.messages.create({ from: FROM, to: From, body: reply }).catch(e => console.log('Twilio send error:', e.message));
+}
   res.send('<Response></Response>');
 });
 
