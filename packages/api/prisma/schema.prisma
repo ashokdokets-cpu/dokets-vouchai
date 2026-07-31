@@ -23,9 +23,11 @@ model User {
   walletBalance Float    @default(0)
   walletCurrency String  @default("INR")
   completedContracts Int  @default(0)
+  totalContractsAsClient Int @default(0)
+  totalContractsAsProvider Int @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-  
+
   contractsAsClient  Contract[] @relation("ClientContracts")
   contractsAsProvider Contract[] @relation("ProviderContracts")
 }
@@ -38,14 +40,25 @@ model Contract {
   status      String   @default("DRAFT")
   amount      Float
   currency    String   @default("INR")
+  upfrontAmount Float?
+  finalAmount  Float
   clientId    String
   client      User     @relation("ClientContracts", fields: [clientId], references: [id])
   providerId  String?
   provider    User?    @relation("ProviderContracts", fields: [providerId], references: [id])
+  location    String?
+  country     String   @default("IN")
+  language    String   @default("en")
   deadline    DateTime
+  platformFee Float    @default(0)
+  totalPaid   Float    @default(0)
+  aiGenerated Boolean  @default(false)
+  hasInsurance Boolean @default(false)
+  startedAt   DateTime?
+  completedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   payments    Payment[]
 }
 
