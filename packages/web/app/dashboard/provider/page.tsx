@@ -135,67 +135,69 @@ export default function ProviderDashboard() {
           ))}
         </div>
 
-        {/* Contract Cards */}
+                {/* Contract Cards */}
         <div className="space-y-4">
-          {(activeTab === 'pending' ? pendingContracts : activeTab === 'active' ? activeContracts : completedContracts).map((contract: any) => (
+          {activeTab === 'pending' && pendingContracts.map((contract: any) => (
             <motion.div key={contract.id} whileHover={{ y: -2 }} 
-              className={`bg-white p-6 rounded-xl shadow-sm border-l-4 ${
-                contract.status === 'PENDING_ACCEPTANCE' ? 'border-l-yellow-500' :
-                contract.status === 'ACTIVE' ? 'border-l-blue-500' :
-                'border-l-green-500'
-              }`}>
+              className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-l-yellow-500">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs font-mono bg-gray-100 px-2 py-0.5 rounded">{contract.vouchId}</span>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                      contract.status === 'PENDING_ACCEPTANCE' ? 'bg-yellow-100 text-yellow-800' :
-                      contract.status === 'ACTIVE' ? 'bg-blue-100 text-blue-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>{contract.status.replace('_', ' ')}</span>
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">PENDING ACCEPTANCE</span>
                   </div>
                   <h3 className="font-semibold text-lg">{contract.title}</h3>
                   <p className="text-gray-600 text-sm mt-1">{contract.description?.substring(0, 120)}</p>
                   <div className="flex items-center gap-4 mt-3 text-sm">
-                    <span className="text-green-600 font-bold">💰 ₹{contract.amount?.toLocaleString()}</span>
-                    <span className="text-gray-500">📅 {new Date(contract.deadline).toLocaleDateString()}</span>
-                    <span className="text-gray-500">📍 {contract.location || 'Remote'}</span>
+                    <span className="text-green-600 font-bold">₹{contract.amount?.toLocaleString()}</span>
+                    <span className="text-gray-500">{new Date(contract.deadline).toLocaleDateString()}</span>
                   </div>
                 </div>
-                <div className="flex flex-col gap-2 ml-4">
-                  {contract.status === 'PENDING_ACCEPTANCE' && (
-                    <button onClick={() => handleAccept(contract.id)}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 whitespace-nowrap">
-                      ✅ Accept Job
-                    </button>
-                  )}
-                  {contract.status === 'ACTIVE' && (
-                    <>
-                      <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center gap-1 whitespace-nowrap">
-                        <Camera className="w-4 h-4" /> Upload Proof
-                      </button>
-                      <button onClick={() => handleComplete(contract.id)}
-                        className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 whitespace-nowrap">
-                        ✅ Mark Complete
-                      </button>
-                    </>
-                  )}
-                </div>
+                <button onClick={() => handleAccept(contract.id)}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700">
+                  Accept Job
+                </button>
               </div>
             </motion.div>
           ))}
-          {(activeTab === 'pending' ? pendingContracts : activeTab === 'active' ? activeContracts : completedContracts).length === 0 && (
-            <div className="text-center py-16 bg-white rounded-xl border">
-              <div className="text-6xl mb-4">
-                {activeTab === 'pending' ? '🔔' : activeTab === 'active' ? '🔵' : '✅'}
+          {activeTab === 'active' && activeContracts.map((contract: any) => (
+            <motion.div key={contract.id} whileHover={{ y: -2 }} 
+              className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-l-blue-500">
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">ACTIVE</span>
+                  <h3 className="font-semibold text-lg mt-2">{contract.title}</h3>
+                  <p className="text-gray-600 text-sm mt-1">{contract.description?.substring(0, 120)}</p>
+                  <div className="flex items-center gap-4 mt-3 text-sm">
+                    <span className="text-green-600 font-bold">₹{contract.amount?.toLocaleString()}</span>
+                    <span className="text-gray-500">{new Date(contract.deadline).toLocaleDateString()}</span>
+                  </div>
+                </div>
+                <button onClick={() => handleComplete(contract.id)}
+                  className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-purple-700">
+                  Mark Complete
+                </button>
               </div>
-              <p className="text-gray-500 text-lg">
-                {activeTab === 'pending' ? 'No pending jobs. Check back soon!' :
-                 activeTab === 'active' ? 'No active jobs. Accept a pending job to start!' :
-                 'No completed jobs yet.'}
-              </p>
-            </div>
+            </motion.div>
           ))}
+          {activeTab === 'completed' && completedContracts.map((contract: any) => (
+            <motion.div key={contract.id} whileHover={{ y: -2 }} 
+              className="bg-white p-6 rounded-xl shadow-sm border-l-4 border-l-green-500">
+              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">COMPLETED</span>
+              <h3 className="font-semibold text-lg mt-2">{contract.title}</h3>
+              <div className="flex items-center gap-4 mt-3 text-sm">
+                <span className="text-green-600 font-bold">₹{contract.amount?.toLocaleString()}</span>
+              </div>
+            </motion.div>
+          ))}
+          {((activeTab === 'pending' && pendingContracts.length === 0) || 
+            (activeTab === 'active' && activeContracts.length === 0) || 
+            (activeTab === 'completed' && completedContracts.length === 0)) && (
+            <div className="text-center py-16 bg-white rounded-xl border">
+              <div className="text-6xl mb-4">{activeTab === 'pending' ? '🔔' : activeTab === 'active' ? '🔵' : '✅'}</div>
+              <p className="text-gray-500 text-lg">No {activeTab} contracts found.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
