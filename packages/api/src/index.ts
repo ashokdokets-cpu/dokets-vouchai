@@ -42,7 +42,7 @@ app.post('/webhook', async (req, res) => {
   const { From, Body, MediaUrl0 } = req.body;
   if (!From) return res.send('<Response></Response>');
   
-  let phone = From.replace('whatsapp:', '').trim();
+  let phone = From.replace('whatsapp:', '').replace(/\s/g, '');
   if (!phone.startsWith('+')) phone = '+' + phone;
   const msg = (Body || '').trim();
   const ml = msg.toLowerCase();
