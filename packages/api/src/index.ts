@@ -125,7 +125,7 @@ app.post('/webhook', async (req, res) => {
     const contracts = await r.json();
     reply = contracts.length === 0 ? 'No contracts.' : 'Contracts:\n\n' + contracts.slice(0, 10).map((c: any) => {
       const e = c.status === 'COMPLETED' ? '[OK]' : c.status === 'ACTIVE' ? '[>>]' : '[..]';
-      return e + ' ' + c.title + '\nRs' + c.amount + ' | ' + c.status;
+      return e + ' ' + c.title + '\nRs' + c.amount + ' | ' + c.status + '\nID: ' + c.id;
     }).join('\n\n');
   }
   else if (ml === 'score') {
