@@ -9,6 +9,7 @@ import {
   Shield, LayoutDashboard, User, Settings, LogOut,
   TrendingUp, AlertCircle
 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function ClientDashboard() {
   const [user, setUser] = useState<any>(null);
@@ -76,21 +77,22 @@ export default function ClientDashboard() {
         {/* Sidebar */}
         <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200 min-h-screen fixed left-0 top-0 pt-16">
           <nav className="p-4 space-y-1">
-            {[
-              { icon: <LayoutDashboard className="w-5 h-5" />, label: 'Dashboard', active: true },
-              { icon: <Briefcase className="w-5 h-5" />, label: 'My Contracts' },
-              { icon: <DollarSign className="w-5 h-5" />, label: 'Payments' },
-              { icon: <Star className="w-5 h-5" />, label: 'Vouch Score' },
-              { icon: <User className="w-5 h-5" />, label: 'Profile' },
-              { icon: <Settings className="w-5 h-5" />, label: 'Settings' },
-            ].map((item, i) => (
-              <button key={i} className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                item.active ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'
-              }`}>
-                {item.icon} {item.label}
-              </button>
-            ))}
-          </nav>
+  <Link href="/dashboard/client" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium bg-blue-50 text-blue-700">
+    <LayoutDashboard className="w-5 h-5" /> Dashboard
+  </Link>
+  <Link href="/payments" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
+    <DollarSign className="w-5 h-5" /> Payments
+  </Link>
+  <Link href="/vouch-score" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
+    <Star className="w-5 h-5" /> Vouch Score
+  </Link>
+  <Link href="/profile" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
+    <User className="w-5 h-5" /> Profile
+  </Link>
+  <Link href="/settings" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
+    <Settings className="w-5 h-5" /> Settings
+  </Link>
+</nav>
         </aside>
 
         {/* Main Content */}
