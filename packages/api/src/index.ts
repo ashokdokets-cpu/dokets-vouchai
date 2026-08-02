@@ -135,7 +135,7 @@ app.post('/webhook', async (req, res) => {
   else { reply = 'VouchAI Bot\n\nCREATE | STATUS | SCORE | HELP'; }
 
   if (tc) {
-  await tc.messages.create({ from: FROM, to: From, body: reply }).catch(e => console.log('Twilio send error:', e.message));
+  await tc.messages.create({ from: FROM, to: 'whatsapp:' + phone, body: reply }).catch(e => console.log('Twilio send error:', e.message));
 }
   res.send('<Response></Response>');
 });
