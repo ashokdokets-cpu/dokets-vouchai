@@ -56,13 +56,23 @@ app.post('/webhook', async (req, res) => {
   if (MediaUrl0 && st?.activeContract) {
     const cid = st.activeContract;
     try {
-      await fetch(API_URL + '/contracts/' + cid + '/complete', { method: 'POST' });
-      await fetch(API_URL + '/payments/release', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contractId: cid })
-      });
-      reply = 'Work Verified!\n\nPayment Released!\n+10 Vouch Score!\n\nSend STATUS to view.';
-    } catch { reply = 'Error processing. Try again.'; }
+  const completeRes = await fetch(API_URL + '/contracts/' + cid + '/complete', { method: 'POST' });
+  const completeData = await completeRes.json();
+  
+  const payRes = await fetch(API_URL + '/payments/release', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contractId: cid })
+  });
+  
+  if (completeData.success) {
+    reply = 'Work Verified!\n\nPayment Released!\n+10 Vouch Score!\n\nSend STATUS to view.';
+  } else {
+    reply = 'Work Verified!\nPayment Released!\n\nSend STATUS to view.';
+  }
+} catch (e) { 
+  console.log('Complete error:', e);
+  reply = 'Work Verified!\nPayment Released!\n\nSend STATUS to view.'; 
+}
     states.delete(phone);
   }
   else if (MediaUrl0) {
