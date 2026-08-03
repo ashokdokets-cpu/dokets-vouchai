@@ -8,6 +8,13 @@ dotenv.config();
 import userRoutes from './routes/users';
 import contractRoutes from './routes/contracts';
 import paymentRoutes from './routes/payments';
+import razorpayRoutes from './routes/razorpay';
+// After other app.use lines:
+app.use('/api/razorpay', razorpayRoutes);
+import verificationRoutes from './routes/verification';
+app.use('/api/verification', verificationRoutes);
+import currencyRoutes from './routes/currency';
+app.use('/api/currency', currencyRoutes);
 
 const app = express();
 const PORT = process.env.PORT || 10000;
