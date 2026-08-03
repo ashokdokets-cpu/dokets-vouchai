@@ -51,11 +51,9 @@ export default function GlobalNav() {
           {/* Left Section */}
           <div className="flex items-center gap-2 sm:gap-4">
             <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              </div>
-              <span className="font-bold text-base sm:text-lg hidden xs:block">VouchAI</span>
-            </Link>
+  <img src="/logo.jpeg" alt="Dokets VouchAI" className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-cover" />
+  <span className="font-bold text-base sm:text-lg hidden xs:block">Dokets VouchAI</span>
+</Link>
             
             {/* Role Switcher - visible on all screens */}
             <div className="flex bg-gray-100 rounded-lg p-0.5 flex-shrink-0">
@@ -122,13 +120,13 @@ export default function GlobalNav() {
             <div className="p-3 pb-1">
               <p className="text-xs text-gray-400 mb-2 px-1">I want to</p>
               <div className="flex bg-gray-100 rounded-lg p-0.5">
-                <button onClick={() => { setRole('client'); setOpen(false); }} 
+                <button onClick={() => setRole('client')} 
                   className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-all ${
                     role === 'client' ? 'bg-white shadow text-blue-600' : 'text-gray-500'
                   }`}>
                   👤 Hire Services
                 </button>
-                <button onClick={() => { setRole('provider'); setOpen(false); }}
+                <button onClick={() => setRole('provider')}
                   className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-all ${
                     role === 'provider' ? 'bg-white shadow text-green-600' : 'text-gray-500'
                   }`}>

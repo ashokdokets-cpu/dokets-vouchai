@@ -4,7 +4,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import GlobalNav from "@/components/GlobalNav";
 
 export const metadata: Metadata = {
-  title: "VouchAI - Trust in Every Deal",
+  title: "Dokets VouchAI - Trust in Every Deal",
   description: "AI-Powered Micro-Escrow Platform",
 };
 
