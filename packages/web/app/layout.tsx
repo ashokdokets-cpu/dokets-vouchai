@@ -5,7 +5,8 @@ import GlobalNav from "@/components/GlobalNav";
 
 export const metadata: Metadata = {
   title: "Dokets VouchAI - Trust in Every Deal",
-  description: "AI-Powered Micro-Escrow Platform",
+  description: "AI-Powered Micro-Escrow Platform for the Global Economy",
+  icons: { icon: '/logo.jpeg' },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
