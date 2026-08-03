@@ -9,7 +9,7 @@ import {
   Shield, LayoutDashboard, User, Settings, LogOut,
   TrendingUp, AlertCircle
 } from 'lucide-react';
-import Link from 'next/link';
+
 
 export default function ClientDashboard() {
   const [user, setUser] = useState<any>(null);
