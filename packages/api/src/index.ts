@@ -15,6 +15,8 @@ import verificationRoutes from './routes/verification';
 app.use('/api/verification', verificationRoutes);
 import currencyRoutes from './routes/currency';
 app.use('/api/currency', currencyRoutes);
+import mediationRoutes from './routes/mediation';
+app.use('/api/mediation', mediationRoutes);
 
 const app = express();
 const PORT = process.env.PORT || 10000;
