@@ -4,9 +4,18 @@ import { AuthProvider } from "@/context/AuthContext";
 import GlobalNav from "@/components/GlobalNav";
 
 export const metadata: Metadata = {
-  title: "Dokets VouchAI - Trust in Every Deal",
-  description: "AI-Powered Micro-Escrow Platform for the Global Economy",
+  title: "Dokets VouchAI - Trust in Every Deal | AI Micro-Escrow Platform",
+  description: "AI-Powered Micro-Escrow Platform. Create contracts, secure payments, verify work via WhatsApp. 1% fee. 15+ currencies. Global.",
   icons: { icon: '/logo.jpeg' },
+  keywords: "escrow, micro-escrow, AI contracts, WhatsApp payments, freelancer payment, secure payment India",
+  openGraph: {
+    title: "Dokets VouchAI - Trust in Every Deal",
+    description: "AI-Powered Micro-Escrow Platform",
+    url: "https://dokets.com",
+    siteName: "Dokets VouchAI",
+    locale: "en_US",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -170,4 +170,30 @@ router.get('/user/:userId', async (req: Request, res: Response) => {
   }
 });
 
+// ============================================
+// UPI INTEGRATION (via Razorpay)
+// ============================================
+
+router.post('/upi/create-order', async (req: Request, res: Response) => {
+  try {
+    const { amount, contractId, userId, providerId, upiId } = req.body;
+    const orderId = 'UPI_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    const platformFee = Math.round(amount * 0.01 * 100) / 100;
+    const netAmount = amount - platformFee;
+
+    const payment = await prisma.payment.create({
+      data: {
+        contractId, amount, currency: 'INR', gateway: 'UPI',
+        status: 'HELD', gatewayOrderId: orderId,
+        platformFee, gatewayFee: 0, netAmount,
+        fromUserId: userId, toUserId: providerId
+      }
+    });
+
+    res.json({ success: true, orderId, amount, upiId: upiId || 'dokets@upi', payment });
+  } catch (error: any) { res.status(500).json({ error: error.message }); }
+});
+
+
 export default router;
