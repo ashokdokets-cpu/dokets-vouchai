@@ -31,7 +31,7 @@ export default function HomePage() {
               <a href="#features" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">Features</a>
               <a href="#comparison" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">Compare</a>
               <div className="h-5 w-px bg-gray-200"></div>
-              <Link href="/dashboard/client" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">Sign In</Link>
+              <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">Sign In</Link>
               <Link href="/contracts/create" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md">
                 Get Started
               </Link>
@@ -211,7 +211,7 @@ export default function HomePage() {
             <Link href="/contracts/create" className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-base hover:bg-gray-50 transition-all shadow-lg inline-flex items-center justify-center gap-2">
               🚀 Get Started Free <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/dashboard/provider" className="bg-white/10 text-white px-8 py-4 rounded-xl font-semibold text-base hover:bg-white/20 transition-all border border-white/20 inline-flex items-center justify-center gap-2">
+            <Link href="/login" className="bg-white/10 text-white px-8 py-4 rounded-xl font-semibold text-base hover:bg-white/20 transition-all border border-white/20 inline-flex items-center justify-center gap-2">
               🔧 I'm a Provider
             </Link>
           </div>
