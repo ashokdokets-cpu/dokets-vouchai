@@ -16,7 +16,7 @@ router.post('/verify', async (req: Request, res: Response) => {
     // Try real AI verification
     if (process.env.OPENAI_API_KEY) {
       try {
-        const OpenAI = require('openai');
+        const { default: OpenAI } = await import('openai');
         const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
         
         const response = await openai.chat.completions.create({
