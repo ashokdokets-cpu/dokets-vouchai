@@ -3,19 +3,14 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface User {
-  id: string;
-  phone: string;
-  name: string;
-  vouchScore: number;
-  vouchTier: string;
-  walletBalance: number;
-  completedContracts: number;
+  id: string; phone: string; name: string; vouchScore: number;
+  vouchTier: string; walletBalance: number; completedContracts: number;
 }
 
 interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  login: (phone: string) => Promise<void>;
+  user: User | null; loading: boolean;
+  sendOTP: (phone: string) => Promise<string>;
+  verifyOTP: (phone: string, code: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -28,29 +23,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const saved = localStorage.getItem('vouchai_user');
     if (saved) {
-      setUser(JSON.parse(saved));
+      try { setUser(JSON.parse(saved)); } catch {}
     }
     setLoading(false);
   }, []);
 
-  const login = async (phone: string) => {
-    setLoading(true);
-    try {
-      const res = await fetch('https://dokets-vouchai.onrender.com/api/users/phone/' + phone);
-      let data = await res.json();
-      if (!data.id) {
-        const createRes = await fetch('https://dokets-vouchai.onrender.com/api/users/register', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, name: 'User', country: 'IN', language: 'en' })
-        });
-        data = (await createRes.json()).user;
-      }
-      setUser(data);
-      localStorage.setItem('vouchai_user', JSON.stringify(data));
-    } catch (e) {
-      alert('Login failed. Check API.');
+  const sendOTP = async (phone: string) => {
+    const res = await fetch('https://dokets-vouchai.onrender.com/api/auth/send-otp', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone })
+    });
+    const data = await res.json();
+    return data.success ? (data.otp || 'sent') : '';
+  };
+
+  const verifyOTP = async (phone: string, code: string) => {
+    const res = await fetch('https://dokets-vouchai.onrender.com/api/auth/verify-otp', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, code })
+    });
+    const data = await res.json();
+    if (data.success && data.user) {
+      setUser(data.user);
+      localStorage.setItem('vouchai_user', JSON.stringify(data.user));
+      return true;
     }
-    setLoading(false);
+    return false;
   };
 
   const logout = () => {
@@ -59,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, sendOTP, verifyOTP, logout }}>
       {children}
     </AuthContext.Provider>
   );

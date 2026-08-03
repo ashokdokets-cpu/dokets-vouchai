@@ -150,6 +150,61 @@ app.post('/webhook', async (req, res) => {
   res.send('<Response></Response>');
 });
 
+// OTP Store (in production, use Redis)
+const otpStore: Map<string, { code: string; expires: number }> = new Map();
+
+// Send OTP
+app.post('/api/auth/send-otp', async (req, res) => {
+  const { phone } = req.body;
+  if (!phone) return res.status(400).json({ error: 'Phone required' });
+  
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  otpStore.set(phone, { code, expires: Date.now() + 300000 }); // 5 min expiry
+  
+  // Send via WhatsApp
+  if (tc) {
+    await tc.messages.create({
+      from: FROM,
+      to: 'whatsapp:' + phone,
+      body: '🔐 *VouchAI Verification Code*\n\nYour OTP is: *' + code + '*\n\nValid for 5 minutes.\n\nDo not share this code.'
+    }).catch(e => console.log('OTP send error:', e.message));
+  }
+  
+  // In development, return code
+  res.json({ 
+    success: true, 
+    message: 'OTP sent via WhatsApp',
+    otp: process.env.NODE_ENV !== 'production' ? code : undefined
+  });
+});
+
+// Verify OTP
+app.post('/api/auth/verify-otp', async (req, res) => {
+  const { phone, code } = req.body;
+  
+  const stored = otpStore.get(phone);
+  if (!stored) return res.status(400).json({ error: 'No OTP requested' });
+  if (Date.now() > stored.expires) {
+    otpStore.delete(phone);
+    return res.status(400).json({ error: 'OTP expired' });
+  }
+  if (stored.code !== code) return res.status(400).json({ error: 'Invalid OTP' });
+  
+  otpStore.delete(phone);
+  
+  // Get or create user
+  let user = await fetch(API_URL + '/users/phone/' + phone).then(r => r.json());
+  if (!user.id) {
+    const cr = await fetch(API_URL + '/users/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, name: 'User' + phone.slice(-4), country: 'IN', language: 'en' })
+    });
+    user = (await cr.json()).user;
+  }
+  
+  res.json({ success: true, user, token: 'vouch_' + Date.now() + '_' + Math.random().toString(36) });
+});
+
 // Health
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'VouchAI API', timestamp: new Date().toISOString(), version: '2.0.0' });

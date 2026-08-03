@@ -8,11 +8,11 @@ import { useAuth } from '@/context/AuthContext';
 import { 
   Plus, CheckCircle, DollarSign, Star, 
   Briefcase, ChevronRight, TrendingUp,
-  Shield, LayoutDashboard, User, Settings
+  Shield, LayoutDashboard, User, Settings, LogOut
 } from 'lucide-react';
 
 export default function ClientDashboard() {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [contracts, setContracts] = useState<any[]>([]);
   const [filter, setFilter] = useState('all');
   const router = useRouter();
@@ -42,6 +42,10 @@ export default function ClientDashboard() {
             <Link href="/vouch-score" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50"><Star className="w-5 h-5" /> Vouch Score</Link>
             <Link href="/profile" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50"><User className="w-5 h-5" /> Profile</Link>
             <Link href="/settings" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50"><Settings className="w-5 h-5" /> Settings</Link>
+           <button onClick={() => { logout(); router.push('/login'); }} 
+           className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 mt-4 border-t pt-4">
+           <LogOut className="w-5 h-5" /> Logout
+          </button>
           </nav>
         </aside>
 
