@@ -90,6 +90,9 @@ export default function ProviderDashboard() {
   <Link href="/dashboard/provider" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium bg-green-50 text-green-700">
     <LayoutDashboard className="w-5 h-5" /> Dashboard
   </Link>
+  <Link href="/dashboard/provider" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
+    <Briefcase className="w-5 h-5" /> My Jobs
+  </Link>
   <Link href="/payments" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50">
     <DollarSign className="w-5 h-5" /> Earnings
   </Link>
