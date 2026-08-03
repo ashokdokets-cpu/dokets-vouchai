@@ -103,6 +103,7 @@ router.post('/', async (req: Request, res: Response) => {
   data: {
     vouchId, title, description,
     amount, currency: currency || 'INR',
+    finalAmount: amount,  // ADD THIS LINE
     clientId,
     providerId: null,
     location: location || 'Remote',
@@ -112,7 +113,7 @@ router.post('/', async (req: Request, res: Response) => {
     status: 'OPEN',
     platformFee: Math.round(amount * 0.01 * 100) / 100,
     aiGenerated: true
-  }
+}
 });
     
     res.json({ success: true, contract });
