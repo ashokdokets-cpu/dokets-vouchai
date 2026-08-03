@@ -221,15 +221,55 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="bg-gray-900 text-gray-400 py-12">
-        <div className="max-w-7xl mx-auto px-6 text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Shield className="w-5 h-5 text-blue-400" />
-            <span className="text-lg font-bold text-white">VouchAI</span>
+            {/* FOOTER */}
+      <footer className="bg-gray-900 text-gray-400 pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            <div>
+              <h3 className="text-white font-semibold mb-4">VouchAI</h3>
+              <p className="text-sm leading-relaxed">AI-Powered Micro-Escrow Platform. Trust in Every Deal.</p>
+              <p className="text-xs mt-3 text-gray-500">A Product of Charvak IT Consulting Pvt Ltd</p>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold mb-4">Platform</h3>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/jobs" className="hover:text-white transition-colors">Find Work</Link></li>
+                <li><Link href="/jobs/post" className="hover:text-white transition-colors">Post a Job</Link></li>
+                <li><Link href="/services" className="hover:text-white transition-colors">Services</Link></li>
+                <li><Link href="/dashboard/client" className="hover:text-white transition-colors">Dashboard</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold mb-4">Company</h3>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
+                <li><Link href="/why-dokets" className="hover:text-white transition-colors">Why Dokets</Link></li>
+                <li><a href="https://www.doketsrb.com" target="_blank" className="hover:text-white transition-colors">Resume Builder</a></li>
+                <li><a href="https://www.dokets.shop" target="_blank" className="hover:text-white transition-colors">Dokets Shop</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-white font-semibold mb-4">Legal</h3>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link></li>
+                <li><Link href="/refunds" className="hover:text-white transition-colors">Refunds & Cancellations</Link></li>
+                <li><Link href="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link></li>
+                <li><Link href="/compliance" className="hover:text-white transition-colors">Compliance (GDPR)</Link></li>
+              </ul>
+            </div>
           </div>
-          <p className="text-sm">Trust in Every Deal • AI-Powered Escrow Technology</p>
-          <p className="text-xs mt-2 text-gray-600">© 2026 VouchAI. All rights reserved.</p>
+          <div className="border-t border-gray-800 pt-8 text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Shield className="w-5 h-5 text-blue-400" />
+              <span className="text-lg font-bold text-white">VouchAI</span>
+            </div>
+            <p className="text-sm">Trust in Every Deal · AI-Powered Escrow Technology</p>
+            <p className="text-xs mt-2 text-gray-600">© 2026 Charvak IT Consulting Pvt Ltd. All rights reserved.</p>
+            <p className="text-xs mt-1 text-gray-600">
+              <a href="mailto:contact@dokets.com" className="hover:text-gray-400 transition-colors">contact@dokets.com</a>
+            </p>
+          </div>
         </div>
       </footer>
     </div>
