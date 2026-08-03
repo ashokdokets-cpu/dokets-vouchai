@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Briefcase, DollarSign, Star, CheckCircle, AlertCircle, TrendingUp, LayoutDashboard, User, Settings } from 'lucide-react';
+import { Briefcase, DollarSign, Star, CheckCircle, AlertCircle, TrendingUp, LayoutDashboard, User, Settings, Bell } from 'lucide-react';
 
 export default function ProviderDashboard() {
   const { user, loading } = useAuth();
