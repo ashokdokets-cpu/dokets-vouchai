@@ -23,7 +23,7 @@ export default function HomePage() {
               <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
                 <Shield className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">VouchAI</span>
+              <span className="text-xl font-bold text-gray-900">Dokets VouchAI</span>
             </Link>
             
             <div className="hidden md:flex items-center gap-8">
@@ -166,7 +166,7 @@ export default function HomePage() {
       <section id="comparison" className="py-24 bg-gray-50">
         <div className="max-w-5xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Why VouchAI?</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Why Dokets VouchAI?</h2>
             <p className="mt-4 text-lg text-gray-500">The clear choice for secure transactions</p>
           </div>
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -174,7 +174,7 @@ export default function HomePage() {
               <thead>
                 <tr className="bg-blue-600 text-white">
                   <th className="text-left p-5 font-semibold">Feature</th>
-                  <th className="p-5 font-semibold text-center">VouchAI</th>
+                  <th className="p-5 font-semibold text-center">Dokets VouchAI</th>
                   <th className="p-5 text-center text-blue-100">Upwork</th>
                   <th className="p-5 text-center text-blue-100">Fiverr</th>
                   <th className="p-5 text-center text-blue-100">Escrow.com</th>
@@ -226,7 +226,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div>
-              <h3 className="text-white font-semibold mb-4">VouchAI</h3>
+              <h3 className="text-white font-semibold mb-4">Dokets VouchAI</h3>
               <p className="text-sm leading-relaxed">AI-Powered Micro-Escrow Platform. Trust in Every Deal.</p>
               <p className="text-xs mt-3 text-gray-500">A Product of Charvak IT Consulting Pvt Ltd</p>
             </div>
@@ -262,7 +262,7 @@ export default function HomePage() {
           <div className="border-t border-gray-800 pt-8 text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Shield className="w-5 h-5 text-blue-400" />
-              <span className="text-lg font-bold text-white">VouchAI</span>
+              <span className="text-lg font-bold text-white">Dokets VouchAI</span>
             </div>
             <p className="text-sm">Trust in Every Deal · AI-Powered Escrow Technology</p>
             <p className="text-xs mt-2 text-gray-600">© 2026 Charvak IT Consulting Pvt Ltd. All rights reserved.</p>
