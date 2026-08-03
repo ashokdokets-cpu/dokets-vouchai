@@ -73,9 +73,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center p-4">
       <div className="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-8 h-8 text-white" />
-          </div>
+          <img src="/logo.jpeg" alt="Dokets VouchAI" className="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover" />
           <h1 className="text-2xl font-bold">Welcome to VouchAI</h1>
           <p className="text-gray-500 mt-2">
             {step === 'phone' && 'Enter your phone number'}

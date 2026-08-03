@@ -20,9 +20,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
+              <img src="/logo.jpeg" alt="Dokets VouchAI" className="w-9 h-9 rounded-xl object-cover" />
               <span className="text-xl font-bold text-gray-900">Dokets VouchAI</span>
             </Link>
             
@@ -261,7 +259,7 @@ export default function HomePage() {
           </div>
           <div className="border-t border-gray-800 pt-8 text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Shield className="w-5 h-5 text-blue-400" />
+              <img src="/logo.jpeg" alt="Dokets VouchAI" className="w-5 h-5 rounded object-cover" />
               <span className="text-lg font-bold text-white">Dokets VouchAI</span>
             </div>
             <p className="text-sm">Trust in Every Deal · AI-Powered Escrow Technology</p>
