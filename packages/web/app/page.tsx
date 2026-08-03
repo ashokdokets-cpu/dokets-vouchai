@@ -244,7 +244,7 @@ export default function HomePage() {
               <ul className="space-y-2 text-sm">
                 <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
                 <li><Link href="/why-dokets" className="hover:text-white transition-colors">Why Dokets</Link></li>
-                <li><a href="https://www.doketsrb.com" target="_blank" className="hover:text-white transition-colors">Resume Builder</a></li>
+                <li><a href="https://www.doketsrb.com" target="_blank" className="hover:text-white transition-colors">Dokets Resume Builder</a></li>
                 <li><a href="https://www.dokets.shop" target="_blank" className="hover:text-white transition-colors">Dokets Shop</a></li>
               </ul>
             </div>
