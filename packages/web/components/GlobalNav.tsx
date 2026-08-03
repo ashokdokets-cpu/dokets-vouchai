@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { 
   Shield, Menu, X, LayoutDashboard, Search, 
   PlusCircle, DollarSign, Star, User, Settings, Bell, 
-  LogOut, ClipboardList, FileText, Home, CheckCircle
+  LogOut, ClipboardList, FileText, Home, CheckCircle, Briefcase
 } from 'lucide-react';
 
 export default function GlobalNav() {
@@ -37,6 +37,7 @@ export default function GlobalNav() {
   ];
 
   const commonMenu = [
+    { label: 'Services', href: '/services', icon: <Briefcase className="w-4 h-4" /> },
     { label: 'Notifications', href: '/notifications', icon: <Bell className="w-4 h-4" /> },
     { label: 'Profile', href: '/profile', icon: <User className="w-4 h-4" /> },
     { label: 'Settings', href: '/settings', icon: <Settings className="w-4 h-4" /> },

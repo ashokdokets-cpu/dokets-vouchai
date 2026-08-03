@@ -28,7 +28,7 @@ export default function ProviderDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex">
-        <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200 min-h-screen fixed left-0 top-0 pt-16">
+        <aside className="hidden md:flex flex-col w-56 bg-white border-r border-gray-200 min-h-screen fixed left-0 top-0 pt-16">
           <nav className="p-4 space-y-1">
             <Link href="/dashboard/provider" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium bg-green-50 text-green-700"><LayoutDashboard className="w-5 h-5" /> Dashboard</Link>
             <Link href="/payments" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50"><DollarSign className="w-5 h-5" /> Earnings</Link>
