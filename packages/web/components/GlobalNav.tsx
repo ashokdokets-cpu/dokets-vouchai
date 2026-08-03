@@ -104,8 +104,16 @@ export default function GlobalNav() {
             {/* Country/Currency */}
 <div className="hidden lg:flex items-center gap-1">
   <select className="text-xs bg-gray-50 border rounded px-1.5 py-1">
-    <option>🇮🇳</option><option>🇺🇸</option><option>🇬🇧</option><option>🇦🇪</option>
-  </select>
+  <option>🇮🇳 IN</option><option>🇺🇸 US</option><option>🇬🇧 UK</option>
+  <option>🇦🇪 UAE</option><option>🇸🇦 SA</option><option>🇸🇬 SG</option>
+  <option>🇯🇵 JP</option><option>🇨🇳 CN</option><option>🇰🇷 KR</option>
+  <option>🇮🇩 ID</option><option>🇹🇭 TH</option><option>🇵🇭 PH</option>
+  <option>🇻🇳 VN</option><option>🇦🇺 AU</option><option>🇳🇿 NZ</option>
+  <option>🇧🇷 BR</option><option>🇲🇽 MX</option><option>🇦🇷 AR</option>
+  <option>🇨🇦 CA</option><option>🇳🇬 NG</option><option>🇰🇪 KE</option>
+  <option>🇿🇦 ZA</option><option>🇪🇬 EG</option><option>🇩🇪 DE</option>
+  <option>🇫🇷 FR</option><option>🇪🇸 ES</option>
+</select>
   <select className="text-xs bg-gray-50 border rounded px-1.5 py-1">
     <option>₹ INR</option><option>$ USD</option><option>€ EUR</option>
     <option>£ GBP</option><option>¥ JPY</option><option>A$ AUD</option>
