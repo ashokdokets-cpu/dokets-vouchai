@@ -59,9 +59,10 @@ model Contract {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-   milestones  Milestone[]
-   disputes    Dispute[]
-} 
+  payments    Payment[]
+  milestones  Milestone[]
+  disputes    Dispute[]
+}
 
 model Milestone {
   id          String   @id @default(cuid())
