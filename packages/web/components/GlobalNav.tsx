@@ -8,7 +8,8 @@ import { useRouter } from 'next/navigation';
 import { 
   Shield, Menu, X, LayoutDashboard, Search, 
   PlusCircle, DollarSign, Star, User, Settings, Bell, 
-  LogOut, ClipboardList, FileText, Home, CheckCircle, Briefcase, Award
+  LogOut, ClipboardList, FileText, Award, Briefcase, 
+  ChevronDown, Globe
 } from 'lucide-react';
 
 export default function GlobalNav() {
@@ -17,121 +18,116 @@ export default function GlobalNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [role, setRole] = useState<'client' | 'provider'>('client');
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const isActive = (href: string) => pathname === href || pathname?.startsWith(href + '/');
 
-  const clientMenu = [
+  const mainMenu = role === 'client' ? [
     { label: 'Dashboard', href: '/dashboard/client', icon: <LayoutDashboard className="w-4 h-4" /> },
     { label: 'Post a Job', href: '/jobs/post', icon: <PlusCircle className="w-4 h-4" /> },
     { label: 'Create Contract', href: '/contracts/create', icon: <FileText className="w-4 h-4" /> },
-    { label: 'Payments', href: '/payments', icon: <DollarSign className="w-4 h-4" /> },
-    { label: 'Vouch Score', href: '/vouch-score', icon: <Star className="w-4 h-4" /> },
-  ];
-
-  const providerMenu = [
+  ] : [
     { label: 'Dashboard', href: '/dashboard/provider', icon: <LayoutDashboard className="w-4 h-4" /> },
     { label: 'Find Work', href: '/jobs', icon: <Search className="w-4 h-4" /> },
     { label: 'Applications', href: '/applications', icon: <ClipboardList className="w-4 h-4" /> },
-    { label: 'Earnings', href: '/payments', icon: <DollarSign className="w-4 h-4" /> },
-    { label: 'Vouch Score', href: '/vouch-score', icon: <Star className="w-4 h-4" /> },
   ];
 
-  const commonMenu = [
+  const moreMenu = [
+    { label: 'Payments', href: '/payments', icon: <DollarSign className="w-4 h-4" /> },
+    { label: 'Vouch Score', href: '/vouch-score', icon: <Star className="w-4 h-4" /> },
     { label: 'Skill Tests', href: '/skills', icon: <Award className="w-4 h-4" /> },
     { label: 'Services', href: '/services', icon: <Briefcase className="w-4 h-4" /> },
-    { label: 'Notifications', href: '/notifications', icon: <Bell className="w-4 h-4" /> },
-    { label: 'Profile', href: '/profile', icon: <User className="w-4 h-4" /> },
-    { label: 'Settings', href: '/settings', icon: <Settings className="w-4 h-4" /> },
     { label: 'Reviews', href: '/reviews', icon: <Star className="w-4 h-4" /> },
-    { label: 'Disputes', href: '/disputes', icon: <Shield className="w-4 h-4" /> },
-    { label: 'KYC', href: '/kyc', icon: <CheckCircle className="w-4 h-4" /> },
+    { label: 'Notifications', href: '/notifications', icon: <Bell className="w-4 h-4" /> },
   ];
-
-  const menuItems = role === 'client' ? [...clientMenu, ...commonMenu] : [...providerMenu, ...commonMenu];
 
   return (
     <>
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 flex items-center justify-between h-14">
+        <div className="max-w-7xl mx-auto px-3 lg:px-6 flex items-center justify-between h-14">
           {/* Left Section */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-  <img src="/logo.jpeg" alt="Dokets VouchAI" className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-cover" />
-  <span className="font-bold text-base sm:text-lg hidden xs:block">Dokets VouchAI</span>
-</Link>
+              <img src="/logo.jpeg" alt="Dokets VouchAI" className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-cover" />
+              <span className="font-bold text-sm sm:text-base hidden sm:block">Dokets VouchAI</span>
+            </Link>
             
-            {/* Role Switcher - visible on all screens */}
-            <div className="flex bg-gray-100 rounded-lg p-0.5 flex-shrink-0">
+            {/* Role Switcher */}
+            <div className="hidden sm:flex bg-gray-100 rounded-lg p-0.5">
               <button onClick={() => setRole('client')} 
-                className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-xs font-medium transition-all ${
-                  role === 'client' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'
-                }`}>
-                <span className="hidden sm:inline">👤 Hire</span>
-                <span className="sm:hidden">👤</span>
+                className={`px-2 py-1 rounded-md text-xs font-medium transition-all ${role === 'client' ? 'bg-white shadow text-blue-600' : 'text-gray-500'}`}>
+                👤 Hire
               </button>
               <button onClick={() => setRole('provider')}
-                className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-md text-xs font-medium transition-all ${
-                  role === 'provider' ? 'bg-white shadow text-green-600' : 'text-gray-500 hover:text-gray-700'
-                }`}>
-                <span className="hidden sm:inline">🔧 Work</span>
-                <span className="sm:hidden">🔧</span>
+                className={`px-2 py-1 rounded-md text-xs font-medium transition-all ${role === 'provider' ? 'bg-white shadow text-green-600' : 'text-gray-500'}`}>
+                🔧 Work
               </button>
             </div>
-
-{/* Language/Currency Selector */}
-<div className="hidden lg:flex items-center gap-2">
-  <select className="text-xs bg-gray-50 border rounded-lg px-2 py-1.5">
-    <option>🇮🇳 IN</option>
-    <option>🇺🇸 US</option>
-    <option>🇬🇧 UK</option>
-    <option>🇦🇪 UAE</option>
-    <option>🇧🇷 BR</option>
-    <option>🇸🇬 SG</option>
-  </select>
-  <select className="text-xs bg-gray-50 border rounded-lg px-2 py-1.5">
-    <option>₹ INR</option>
-    <option>$ USD</option>
-    <option>€ EUR</option>
-    <option>£ GBP</option>
-    <option>د.إ AED</option>
-  </select>
-</div>
             
-            {/* Desktop Nav */}
+            {/* Desktop Main Nav */}
             <nav className="hidden lg:flex items-center gap-0.5">
-              {menuItems.map((item, i) => (
+              {mainMenu.map((item, i) => (
                 <Link key={i} href={item.href}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm transition-all ${
-                    isActive(item.href) 
-                      ? 'bg-blue-50 text-blue-700 font-medium' 
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium transition-all ${
+                    isActive(item.href) ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'
                   }`}>
                   {item.icon} {item.label}
                 </Link>
               ))}
+              
+              {/* More Dropdown */}
+              <div className="relative">
+                <button onClick={() => setMoreOpen(!moreOpen)}
+                  className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100">
+                  More <ChevronDown className="w-3 h-3" />
+                </button>
+                {moreOpen && (
+                  <div className="absolute top-full left-0 mt-1 bg-white border rounded-xl shadow-lg py-1 w-44 z-50" onMouseLeave={() => setMoreOpen(false)}>
+                    {moreMenu.map((item, i) => (
+                      <Link key={i} href={item.href} onClick={() => setMoreOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                        {item.icon} {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             </nav>
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            {/* Country/Currency */}
+            <div className="hidden lg:flex items-center gap-1">
+              <select className="text-xs bg-gray-50 border rounded px-1.5 py-1">
+                <option>🇮🇳</option><option>🇺🇸</option><option>🇬🇧</option><option>🇦🇪</option>
+              </select>
+              <select className="text-xs bg-gray-50 border rounded px-1.5 py-1">
+                <option>₹</option><option>$</option><option>€</option><option>£</option>
+              </select>
+            </div>
+
             {user ? (
-              <>
-                <span className="text-xs sm:text-sm text-gray-500 hidden sm:block max-w-[80px] truncate">{user.name}</span>
-                <span className="text-xs bg-blue-100 text-blue-700 px-1.5 sm:px-2 py-0.5 rounded-full font-medium">{user.vouchScore}</span>
+              <div className="flex items-center gap-2">
+                <Link href="/profile" className="flex items-center gap-1.5 hover:bg-gray-100 px-2 py-1 rounded-lg">
+                  <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                    {user.name?.[0] || 'U'}
+                  </div>
+                  <span className="text-xs text-gray-700 hidden md:block max-w-[60px] truncate">{user.name}</span>
+                  <span className="text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium">{user.vouchScore}</span>
+                </Link>
                 <button onClick={() => { logout(); router.push('/login'); }}
-                  className="text-sm text-red-600 hover:text-red-700 font-medium hidden sm:flex items-center gap-1">
-                  <LogOut className="w-3 h-3" /> <span className="hidden md:inline">Logout</span>
+                  className="text-xs text-red-500 hover:text-red-700 hidden md:block">
+                  Logout
                 </button>
-              </>
+              </div>
             ) : (
-              <Link href="/login" className="bg-blue-600 text-white px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium hover:bg-blue-700 whitespace-nowrap">
+              <Link href="/login" className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-700">
                 Login
               </Link>
             )}
             
-            {/* Mobile Menu Button - larger touch target */}
-            <button className="lg:hidden p-2 -mr-1 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors" 
-              onClick={() => setOpen(!open)} aria-label="Menu">
+            <button className="lg:hidden p-2 rounded-lg hover:bg-gray-100" onClick={() => setOpen(!open)}>
               {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
@@ -139,55 +135,30 @@ export default function GlobalNav() {
 
         {/* Mobile Menu */}
         {open && (
-          <div className="lg:hidden border-t bg-white shadow-lg animate-in slide-in-from-top">
-            {/* Mobile Role Switcher */}
-            <div className="p-3 pb-1">
-              <p className="text-xs text-gray-400 mb-2 px-1">I want to</p>
-              <div className="flex bg-gray-100 rounded-lg p-0.5">
-                <button onClick={() => setRole('client')} 
-                  className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-all ${
-                    role === 'client' ? 'bg-white shadow text-blue-600' : 'text-gray-500'
-                  }`}>
-                  👤 Hire Services
-                </button>
-                <button onClick={() => setRole('provider')}
-                  className={`flex-1 py-2.5 rounded-md text-sm font-medium transition-all ${
-                    role === 'provider' ? 'bg-white shadow text-green-600' : 'text-gray-500'
-                  }`}>
-                  🔧 Provide Services
-                </button>
+          <div className="lg:hidden border-t bg-white shadow-lg">
+            <div className="p-3">
+              <div className="flex bg-gray-100 rounded-lg p-0.5 mb-3">
+                <button onClick={() => setRole('client')} className={`flex-1 py-2 rounded-md text-sm font-medium ${role === 'client' ? 'bg-white shadow text-blue-600' : 'text-gray-500'}`}>👤 Hire</button>
+                <button onClick={() => setRole('provider')} className={`flex-1 py-2 rounded-md text-sm font-medium ${role === 'provider' ? 'bg-white shadow text-green-600' : 'text-gray-500'}`}>🔧 Work</button>
               </div>
-            </div>
-            
-            <div className="p-3 space-y-0.5">
-              {menuItems.map((item, i) => (
-                <Link key={i} href={item.href} onClick={() => setOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all ${
-                    isActive(item.href) 
-                      ? 'bg-blue-50 text-blue-700 font-medium' 
-                      : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
-                  }`}>
-                  <span className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-                    {item.icon}
-                  </span>
-                  {item.label}
-                </Link>
-              ))}
-              
-              {user && (
-                <button onClick={() => { logout(); router.push('/login'); setOpen(false); }}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-600 hover:bg-red-50 active:bg-red-100 w-full mt-2 border-t pt-3">
-                  <span className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center">
-                    <LogOut className="w-4 h-4" />
-                  </span>
-                  Logout
-                </button>
-              )}
+              <div className="space-y-0.5">
+                {[...mainMenu, ...moreMenu].map((item, i) => (
+                  <Link key={i} href={item.href} onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-gray-700 hover:bg-gray-100">
+                    {item.icon} {item.label}
+                  </Link>
+                ))}
+                {user && (
+                  <button onClick={() => { logout(); router.push('/login'); setOpen(false); }}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-600 hover:bg-red-50 w-full mt-2 border-t pt-3">
+                    <LogOut className="w-4 h-4" /> Logout
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}
       </header>
-      {/* Spacer for fixed header */}
       <div className="h-14"></div>
     </>
   );
