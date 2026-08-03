@@ -110,24 +110,20 @@ router.post('/', async (req: Request, res: Response) => {
     const vouchId = 'VCH-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 6).toUpperCase();
     
     const contract = await prisma.contract.create({
-      data: {
-        vouchId, title, description,
-        amount, currency: currency || 'INR',
-        clientId,
-        providerId: null, // No provider yet - OPEN job
-        location: location || 'Remote',
-        country: country || 'GLOBAL',
-        city: city || null,
-        jobType: jobType || 'REMOTE',
-        category: category || 'General',
-        skills: JSON.stringify(skills || []),
-        deadline: new Date(deadline || Date.now() + 14*24*60*60*1000),
-        status: 'OPEN',
-        isPublic: true,
-        platformFee: Math.round(amount * 0.01 * 100) / 100,
-        aiGenerated: true
-      }
-    });
+  data: {
+    vouchId, title, description,
+    amount, currency: currency || 'INR',
+    clientId,
+    providerId: null,
+    location: location || 'Remote',
+    country: country || 'IN',
+    language: 'en',
+    deadline: new Date(deadline || Date.now() + 14*24*60*60*1000),
+    status: 'PENDING_ACCEPTANCE',
+    platformFee: Math.round(amount * 0.01 * 100) / 100,
+    aiGenerated: true
+  }
+});
     
     res.json({ success: true, contract });
   } catch (e: any) { res.status(500).json({ error: e.message }); }
