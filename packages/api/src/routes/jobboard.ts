@@ -6,25 +6,15 @@ const router = Router();
 // Get available jobs (Job Board)
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const { country, city, jobType, category, skill } = req.query;
+    const { country, city } = req.query;
     
     const where: any = {
       status: 'OPEN',
-      isPublic: true,
       providerId: null
     };
 
-    // Location filter
     if (country) where.country = country as string;
-    if (city) where.city = city as string;
-    if (jobType) where.jobType = jobType as string;
-    if (category) where.category = category as string;
-
-    // For remote jobs, show globally
-    if (jobType === 'REMOTE') {
-      delete where.country;
-      delete where.city;
-    }
+    if (city) where.location = { contains: city as string };
 
     const jobs = await prisma.contract.findMany({
       where,
@@ -119,7 +109,7 @@ router.post('/', async (req: Request, res: Response) => {
     country: country || 'IN',
     language: 'en',
     deadline: new Date(deadline || Date.now() + 14*24*60*60*1000),
-    status: 'PENDING_ACCEPTANCE',
+    status: 'OPEN',
     platformFee: Math.round(amount * 0.01 * 100) / 100,
     aiGenerated: true
   }
