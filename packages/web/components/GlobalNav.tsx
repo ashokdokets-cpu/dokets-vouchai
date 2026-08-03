@@ -36,6 +36,7 @@ export default function GlobalNav() {
     { label: 'Payments', href: '/payments', icon: <DollarSign className="w-4 h-4" /> },
     { label: 'Vouch Score', href: '/vouch-score', icon: <Star className="w-4 h-4" /> },
     { label: 'Skill Tests', href: '/skills', icon: <Award className="w-4 h-4" /> },
+    { label: 'Showcase', href: '/showcase', icon: <Star className="w-4 h-4" /> },
     { label: 'Services', href: '/services', icon: <Briefcase className="w-4 h-4" /> },
     { label: 'Reviews', href: '/reviews', icon: <Star className="w-4 h-4" /> },
     { label: 'Notifications', href: '/notifications', icon: <Bell className="w-4 h-4" /> },

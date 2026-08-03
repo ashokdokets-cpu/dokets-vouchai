@@ -14,6 +14,7 @@ export default function PostJobPage() {
     location: '', country: 'GLOBAL', city: '',
     deadline: ''
   });
+  const [customCategory, setCustomCategory] = useState('');
 
   const handleSubmit = async () => {
     if (!user) return alert('Please login first');
@@ -77,10 +78,30 @@ export default function PostJobPage() {
               <div>
                 <label className="text-sm font-medium mb-1 block">Category</label>
                 <select value={form.category} onChange={e => setForm({...form, category: e.target.value})}
-                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
-                  <option>General</option><option>Development</option><option>Design</option>
-                  <option>Writing</option><option>Marketing</option><option>Video</option>
-                </select>
+  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+  <option value="">Select Category</option>
+  <option value="General">General</option>
+  <option value="Development">💻 Development</option>
+  <option value="Design">🎨 Design</option>
+  <option value="Writing">✍️ Writing</option>
+  <option value="Marketing">📢 Marketing</option>
+  <option value="Video">🎥 Video</option>
+  <option value="Music">🎵 Music</option>
+  <option value="Business">💼 Business</option>
+  <option value="Education">📚 Education</option>
+  <option value="Health">🏥 Health</option>
+  <option value="Fashion">👗 Fashion</option>
+  <option value="Food">🍳 Food</option>
+  <option value="Travel">✈️ Travel</option>
+  <option value="Legal">⚖️ Legal</option>
+  <option value="Custom">✨ Custom (Type Your Own)</option>
+</select>
+
+{form.category === 'Custom' && (
+  <input type="text" placeholder="Enter your custom service category..." value={customCategory}
+    onChange={e => setCustomCategory(e.target.value)}
+    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none mt-2" />
+)}
               </div>
             </div>
 
