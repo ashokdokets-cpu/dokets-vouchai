@@ -32,7 +32,7 @@ export default function HomePage() {
               <a href="#comparison" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">Compare</a>
               <div className="h-5 w-px bg-gray-200"></div>
               <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">Sign In</Link>
-              <Link href="/contracts/create" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md">
+              <Link href="/login" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md">
                 Get Started
               </Link>
             </div>
@@ -65,7 +65,7 @@ export default function HomePage() {
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}
             className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/contracts/create" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-base shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+            <Link href="/login" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold text-base shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
               Start Free <ArrowRight className="w-4 h-4" />
             </Link>
             <a href="#how-it-works" className="w-full sm:w-auto bg-white hover:bg-gray-50 text-gray-700 px-8 py-4 rounded-xl font-semibold text-base border-2 border-gray-200 hover:border-gray-300 transition-all flex items-center justify-center gap-2">
@@ -208,7 +208,7 @@ export default function HomePage() {
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Trust Every Deal?</h2>
           <p className="text-lg text-blue-100 mb-10">Join thousands of users. Create your first contract in 60 seconds.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/contracts/create" className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-base hover:bg-gray-50 transition-all shadow-lg inline-flex items-center justify-center gap-2">
+            <Link href="/login" className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold text-base hover:bg-gray-50 transition-all shadow-lg inline-flex items-center justify-center gap-2">
               🚀 Get Started Free <ArrowRight className="w-4 h-4" />
             </Link>
             <Link href="/login" className="bg-white/10 text-white px-8 py-4 rounded-xl font-semibold text-base hover:bg-white/20 transition-all border border-white/20 inline-flex items-center justify-center gap-2">
