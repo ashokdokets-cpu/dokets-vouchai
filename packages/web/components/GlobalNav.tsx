@@ -102,21 +102,21 @@ export default function GlobalNav() {
           {/* Right Section */}
           <div className="flex items-center gap-2">
             {/* Country/Currency */}
-            <div className="hidden lg:flex items-center gap-1">
-              <select className="text-xs bg-gray-50 border rounded px-1.5 py-1">
-  <option>₹ INR</option><option>$ USD</option><option>€ EUR</option>
-  <option>£ GBP</option><option>¥ JPY</option><option>A$ AUD</option>
-  <option>C$ CAD</option><option>S$ SGD</option><option>R$ BRL</option>
-  <option>د.إ AED</option><option>﷼ SAR</option><option>Mex$ MXN</option>
-  <option>₦ NGN</option><option>KSh KES</option><option>R ZAR</option>
-  <option>E£ EGP</option><option>¥ CNY</option><option>₩ KRW</option>
-  <option>Rp IDR</option><option>₱ PHP</option><option>₫ VND</option>
-  <option>฿ THB</option><option>NZ$ NZD</option><option>AR$ ARS</option>
-</select>
-              <select className="text-xs bg-gray-50 border rounded px-1.5 py-1">
-                <option>₹</option><option>$</option><option>€</option><option>£</option>
-              </select>
-            </div>
+<div className="hidden lg:flex items-center gap-1">
+  <select className="text-xs bg-gray-50 border rounded px-1.5 py-1">
+    <option>🇮🇳</option><option>🇺🇸</option><option>🇬🇧</option><option>🇦🇪</option>
+  </select>
+  <select className="text-xs bg-gray-50 border rounded px-1.5 py-1">
+    <option>₹ INR</option><option>$ USD</option><option>€ EUR</option>
+    <option>£ GBP</option><option>¥ JPY</option><option>A$ AUD</option>
+    <option>C$ CAD</option><option>S$ SGD</option><option>R$ BRL</option>
+    <option>د.إ AED</option><option>﷼ SAR</option><option>Mex$ MXN</option>
+    <option>₦ NGN</option><option>KSh KES</option><option>R ZAR</option>
+    <option>E£ EGP</option><option>¥ CNY</option><option>₩ KRW</option>
+    <option>Rp IDR</option><option>₱ PHP</option><option>₫ VND</option>
+    <option>฿ THB</option><option>NZ$ NZD</option><option>AR$ ARS</option>
+  </select>
+</div>
 
             {user ? (
               <div className="flex items-center gap-2">
