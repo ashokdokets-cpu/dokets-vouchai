@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { 
   Shield, Menu, X, LayoutDashboard, Search, 
   PlusCircle, DollarSign, Star, User, Settings, Bell, 
-  LogOut, ClipboardList, FileText, Award, Briefcase, CheckCircle 
+  LogOut, ClipboardList, FileText, Award, Briefcase, CheckCircle, 
   ChevronDown, Globe
 } from 'lucide-react';
 
