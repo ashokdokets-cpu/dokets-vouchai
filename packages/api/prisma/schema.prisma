@@ -59,8 +59,9 @@ model Contract {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  payments    Payment[]
-}
+   milestones  Milestone[]
+   disputes    Dispute[]
+} 
 
 model Milestone {
   id          String   @id @default(cuid())
@@ -96,4 +97,19 @@ model Payment {
   fromUserId  String
   toUserId    String
   createdAt   DateTime @default(now())
+}
+
+model Dispute {
+  id          String   @id @default(cuid())
+  contractId  String
+  contract    Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  raisedById  String
+  againstId   String
+  category    String
+  description String
+  status      String   @default("OPEN")
+  aiRecommendation String?
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
