@@ -9,14 +9,9 @@ import userRoutes from './routes/users';
 import contractRoutes from './routes/contracts';
 import paymentRoutes from './routes/payments';
 import razorpayRoutes from './routes/razorpay';
-// After other app.use lines:
-app.use('/api/razorpay', razorpayRoutes);
 import verificationRoutes from './routes/verification';
-app.use('/api/verification', verificationRoutes);
 import currencyRoutes from './routes/currency';
-app.use('/api/currency', currencyRoutes);
 import mediationRoutes from './routes/mediation';
-app.use('/api/mediation', mediationRoutes);
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -223,5 +218,9 @@ app.get('/health', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/contracts', contractRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/razorpay', razorpayRoutes);
+app.use('/api/verification', verificationRoutes);
+app.use('/api/mediation', mediationRoutes);
+app.use('/api/currency', currencyRoutes);
 
 app.listen(PORT, () => console.log('VouchAI running on port ' + PORT));
