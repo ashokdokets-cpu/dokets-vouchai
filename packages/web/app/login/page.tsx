@@ -3,16 +3,18 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { Shield, ArrowRight, Key, Phone } from 'lucide-react';
+import { Shield, ArrowRight, Key, Phone, User, Check } from 'lucide-react';
 
 export default function LoginPage() {
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
-  const [step, setStep] = useState<'phone' | 'otp'>('phone');
+  const [step, setStep] = useState<'phone' | 'otp' | 'name'>('phone');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [otpSent, setOtpSent] = useState('');
-  const { sendOTP, verifyOTP } = useAuth();
+  const [userName, setUserName] = useState('');
+  const [userId, setUserId] = useState('');
+  const { sendOTP, verifyOTP, user } = useAuth();
   const router = useRouter();
 
   const handleSendOTP = async () => {
@@ -35,11 +37,36 @@ export default function LoginPage() {
     setError('');
     const success = await verifyOTP(phone, code);
     if (success) {
-      router.push('/dashboard/client');
+      // Check if user has auto-generated name
+      const res = await fetch('https://dokets-vouchai.onrender.com/api/users/phone/' + phone);
+      const userData = await res.json();
+      setUserId(userData.id);
+      if (userData.name && userData.name.startsWith('User')) {
+        setStep('name');
+      } else {
+        router.push('/dashboard/client');
+      }
     } else {
       setError('Invalid or expired code. Try again.');
     }
     setLoading(false);
+  };
+
+  const handleSaveName = async () => {
+    if (!userName.trim()) return setError('Please enter your name');
+    setLoading(true);
+    await fetch('https://dokets-vouchai.onrender.com/api/users/' + userId, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: userName.trim() })
+    });
+    // Update local storage
+    const saved = localStorage.getItem('vouchai_user');
+    if (saved) {
+      const u = JSON.parse(saved);
+      u.name = userName.trim();
+      localStorage.setItem('vouchai_user', JSON.stringify(u));
+    }
+    router.push('/dashboard/client');
   };
 
   return (
@@ -51,7 +78,9 @@ export default function LoginPage() {
           </div>
           <h1 className="text-2xl font-bold">Welcome to VouchAI</h1>
           <p className="text-gray-500 mt-2">
-            {step === 'phone' ? 'Enter your phone number' : 'Enter verification code'}
+            {step === 'phone' && 'Enter your phone number'}
+            {step === 'otp' && 'Enter verification code'}
+            {step === 'name' && 'Complete your profile'}
           </p>
         </div>
 
@@ -59,7 +88,7 @@ export default function LoginPage() {
           <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm mb-4 text-center">{error}</div>
         )}
 
-        {step === 'phone' ? (
+        {step === 'phone' && (
           <>
             <div className="relative mb-4">
               <Phone className="absolute left-4 top-4 w-5 h-5 text-gray-400" />
@@ -72,7 +101,9 @@ export default function LoginPage() {
               {loading ? 'Sending...' : <>Send Code <ArrowRight className="w-4 h-4" /></>}
             </button>
           </>
-        ) : (
+        )}
+
+        {step === 'otp' && (
           <>
             <p className="text-center text-sm text-gray-500 mb-4">
               Code sent to <strong>{phone}</strong>
@@ -94,6 +125,25 @@ export default function LoginPage() {
             </button>
           </>
         )}
+
+        {step === 'name' && (
+          <>
+            <p className="text-center text-sm text-gray-500 mb-4">
+              Welcome! Please enter your full name
+            </p>
+            <div className="relative mb-4">
+              <User className="absolute left-4 top-4 w-5 h-5 text-gray-400" />
+              <input type="text" placeholder="Ramesh Kumar" value={userName}
+                onChange={e => setUserName(e.target.value)}
+                className="w-full pl-12 pr-4 py-4 bg-gray-50 border rounded-2xl text-lg focus:ring-2 focus:ring-blue-500 outline-none" />
+            </div>
+            <button onClick={handleSaveName} disabled={loading || !userName.trim()}
+              className="w-full bg-blue-600 text-white py-4 rounded-2xl font-semibold text-lg hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2">
+              {loading ? 'Saving...' : <>Save & Continue <Check className="w-4 h-4" /></>}
+            </button>
+          </>
+        )}
+
         <p className="text-center text-xs text-gray-400 mt-6">Secure OTP login via WhatsApp</p>
       </div>
     </div>
