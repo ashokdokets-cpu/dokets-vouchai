@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import Razorpay from 'razorpay';
 import prisma from '../config/database';
+import { calculateFee } from '../utils/fees';
 
 const router = Router();
 
@@ -35,7 +36,7 @@ router.post('/verify', async (req: Request, res: Response) => {
     const expected = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET || '').update(sign).digest('hex');
 
     if (razorpay_signature === expected) {
-      const platformFee = Math.round(amount * 0.01);
+      const platformFee = calculateFee(amount, currency || 'INR').fee;
       const gatewayFee = Math.round(amount * 0.02);
       
       await prisma.payment.create({

@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../config/database';
+import { calculateFee } from '../utils/fees';
 
 const router = Router();
 
@@ -102,7 +103,7 @@ router.post('/:id/verify', async (req: Request, res: Response) => {
           currency: 'INR',
           gateway: 'RAZORPAY',
           status: 'RELEASED',
-          platformFee: Math.round(milestone.amount * 0.01),
+          platformFee: calculateFee(milestone.amount, 'INR').fee,
           gatewayFee: Math.round(milestone.amount * 0.02),
           netAmount: Math.round(milestone.amount * 0.97),
           fromUserId: req.body.clientId,

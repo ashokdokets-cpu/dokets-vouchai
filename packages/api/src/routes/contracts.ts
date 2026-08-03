@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../config/database';
+import { calculateFee } from '../utils/fees';
 
 const router = Router();
 
@@ -38,7 +39,7 @@ router.post('/', async (req: Request, res: Response) => {
         country: country || 'IN',
         language: language || 'en',
         deadline: new Date(deadline),
-        platformFee: Math.round(amount * 0.01 * 100) / 100,
+        platformFee: calculateFee(amount, currency || 'INR').fee,
         aiGenerated: true,
         status: 'PENDING_ACCEPTANCE'
       }

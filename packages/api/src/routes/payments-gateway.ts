@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../config/database';
+import { calculateFee } from '../utils/fees';
 
 const router = Router();
 
@@ -17,7 +18,7 @@ router.post('/razorpay/create-order', async (req: Request, res: Response) => {
     const orderId = 'order_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     
     // Hold payment in escrow
-    const platformFee = Math.round(amount * 0.01 * 100) / 100;
+    const platformFee = calculateFee(amount, currency || 'INR').fee;
     const gatewayFee = Math.round(amount * 0.02 * 100) / 100;
     const netAmount = amount - platformFee - gatewayFee;
 
@@ -88,7 +89,7 @@ router.post('/paypal/create-order', async (req: Request, res: Response) => {
     
     const orderId = 'PAYPAL_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     
-    const platformFee = Math.round(amount * 0.01 * 100) / 100;
+    const platformFee = calculateFee(amount, currency || 'INR').fee;
     const gatewayFee = Math.round(amount * 0.044 * 100) / 100 + 0.30;
     const netAmount = amount - platformFee - gatewayFee;
 
@@ -179,7 +180,7 @@ router.post('/upi/create-order', async (req: Request, res: Response) => {
     const { amount, contractId, userId, providerId, upiId } = req.body;
     const orderId = 'UPI_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     
-    const platformFee = Math.round(amount * 0.01 * 100) / 100;
+    const platformFee = calculateFee(amount, currency || 'INR').fee;
     const netAmount = amount - platformFee;
 
     const payment = await prisma.payment.create({
