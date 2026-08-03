@@ -7,6 +7,7 @@ export default function SettingsPage() {
   const [language, setLanguage] = useState('en');
   const [currency, setCurrency] = useState('INR');
   const [notifications, setNotifications] = useState(true);
+  const [form, setForm] = useState({ language: 'en', currency: 'INR' });
 
   return (
     <div className="min-h-screen bg-gray-50">
