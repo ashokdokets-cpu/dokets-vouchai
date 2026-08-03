@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { 
   Shield, Menu, X, LayoutDashboard, Search, 
   PlusCircle, DollarSign, Star, User, Settings, Bell, 
-  LogOut, ClipboardList, FileText, Home, CheckCircle, Briefcase
+  LogOut, ClipboardList, FileText, Home, CheckCircle, Briefcase, Award
 } from 'lucide-react';
 
 export default function GlobalNav() {
@@ -37,6 +37,7 @@ export default function GlobalNav() {
   ];
 
   const commonMenu = [
+    { label: 'Skill Tests', href: '/skills', icon: <Award className="w-4 h-4" /> },
     { label: 'Services', href: '/services', icon: <Briefcase className="w-4 h-4" /> },
     { label: 'Notifications', href: '/notifications', icon: <Bell className="w-4 h-4" /> },
     { label: 'Profile', href: '/profile', icon: <User className="w-4 h-4" /> },
@@ -76,6 +77,25 @@ export default function GlobalNav() {
                 <span className="sm:hidden">🔧</span>
               </button>
             </div>
+
+{/* Language/Currency Selector */}
+<div className="hidden lg:flex items-center gap-2">
+  <select className="text-xs bg-gray-50 border rounded-lg px-2 py-1.5">
+    <option>🇮🇳 IN</option>
+    <option>🇺🇸 US</option>
+    <option>🇬🇧 UK</option>
+    <option>🇦🇪 UAE</option>
+    <option>🇧🇷 BR</option>
+    <option>🇸🇬 SG</option>
+  </select>
+  <select className="text-xs bg-gray-50 border rounded-lg px-2 py-1.5">
+    <option>₹ INR</option>
+    <option>$ USD</option>
+    <option>€ EUR</option>
+    <option>£ GBP</option>
+    <option>د.إ AED</option>
+  </select>
+</div>
             
             {/* Desktop Nav */}
             <nav className="hidden lg:flex items-center gap-0.5">
