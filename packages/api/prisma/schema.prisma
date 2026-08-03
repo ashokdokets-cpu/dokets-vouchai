@@ -37,7 +37,7 @@ model Contract {
   vouchId     String   @unique
   title       String
   description String
-  status      String   @default("DRAFT")
+  status      String   @default("OPEN") // OPEN, ASSIGNED, ACCEPTED, ACTIVE, IN_PROGRESS, COMPLETED, DISPUTED
   amount      Float
   currency    String   @default("INR")
   upfrontAmount Float?
@@ -48,12 +48,18 @@ model Contract {
   provider    User?    @relation("ProviderContracts", fields: [providerId], references: [id])
   location    String?
   country     String   @default("IN")
+  city        String?
   language    String   @default("en")
+  jobType     String   @default("LOCAL") // LOCAL, REMOTE, HYBRID
+  category    String?
+  skills      String   @default("[]") // JSON array of required skills
   deadline    DateTime
   platformFee Float    @default(0)
   totalPaid   Float    @default(0)
   aiGenerated Boolean  @default(false)
   hasInsurance Boolean @default(false)
+  isPublic    Boolean  @default(true) // Visible on job board
+  applicants  String   @default("[]") // JSON array of provider IDs who applied
   startedAt   DateTime?
   completedAt DateTime?
   createdAt   DateTime @default(now())
