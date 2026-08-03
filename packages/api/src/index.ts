@@ -16,6 +16,8 @@ import milestoneRoutes from './routes/milestones';
 import jobBoardRoutes from './routes/jobboard';
 import paymentGatewayRoutes from './routes/payments-gateway';
 import emailRoutes from './routes/email';
+import subscriptionRoutes from './routes/subscriptions';
+import disputeFeeRoutes from './routes/dispute-fees';
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -245,5 +247,7 @@ app.use('/api/milestones', milestoneRoutes);
 app.use('/api/jobs', jobBoardRoutes);
 app.use('/api/gateway', paymentGatewayRoutes);
 app.use('/api/email', emailRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/dispute-fees', disputeFeeRoutes);
 
 app.listen(PORT, () => console.log('VouchAI running on port ' + PORT));

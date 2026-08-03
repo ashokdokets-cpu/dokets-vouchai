@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import prisma from '../config/database';
+import { calculateFee } from '../utils/fees';
 
 const router = Router();
 
@@ -7,7 +8,8 @@ const router = Router();
 router.post('/hold', async (req: Request, res: Response) => {
   try {
     const { contractId, amount, currency, gateway, fromUserId, toUserId } = req.body;
-    const platformFee = Math.round(amount * 0.01 * 100) / 100;
+    const feeCalc = calculateFee(amount, currency);
+    const platformFee = feeCalc.fee;
     const gatewayFee = Math.round(amount * 0.02 * 100) / 100;
     const netAmount = amount - platformFee - gatewayFee;
 
