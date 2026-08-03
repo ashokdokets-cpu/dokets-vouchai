@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import OpenAI from 'openai';
+import { OpenAI } from 'openai';
 import prisma from '../config/database';
 
 const router = Router();
@@ -14,7 +14,7 @@ router.post('/verify', async (req: Request, res: Response) => {
 
     // AI verification using GPT-4 Vision
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       messages: [{
         role: "user",
         content: [
