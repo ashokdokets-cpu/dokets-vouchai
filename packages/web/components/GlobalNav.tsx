@@ -40,6 +40,9 @@ export default function GlobalNav() {
     { label: 'Notifications', href: '/notifications', icon: <Bell className="w-4 h-4" /> },
     { label: 'Profile', href: '/profile', icon: <User className="w-4 h-4" /> },
     { label: 'Settings', href: '/settings', icon: <Settings className="w-4 h-4" /> },
+    { label: 'Reviews', href: '/reviews', icon: <Star className="w-4 h-4" /> },
+    { label: 'Disputes', href: '/disputes', icon: <Shield className="w-4 h-4" /> },
+    { label: 'KYC', href: '/kyc', icon: <CheckCircle className="w-4 h-4" /> },
   ];
 
   const menuItems = role === 'client' ? [...clientMenu, ...commonMenu] : [...providerMenu, ...commonMenu];
