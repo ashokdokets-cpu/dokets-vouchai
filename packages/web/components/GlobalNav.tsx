@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { 
   Shield, Menu, X, LayoutDashboard, Search, 
   PlusCircle, DollarSign, Star, User, Settings, Bell, 
-  LogOut, ClipboardList, FileText, Home
+  LogOut, ClipboardList, FileText, Home, CheckCircle
 } from 'lucide-react';
 
 export default function GlobalNav() {
