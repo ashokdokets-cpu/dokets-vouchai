@@ -59,9 +59,32 @@ export default function PostJobPage() {
               <div>
                 <label className="text-sm font-medium mb-1 block">Currency</label>
                 <select value={form.currency} onChange={e => setForm({...form, currency: e.target.value})}
-                  className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
-                  <option>INR</option><option>USD</option><option>EUR</option><option>GBP</option>
-                </select>
+  className="w-full px-3 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+  <option value="INR">₹ INR</option>
+  <option value="USD">$ USD</option>
+  <option value="EUR">€ EUR</option>
+  <option value="GBP">£ GBP</option>
+  <option value="JPY">¥ JPY</option>
+  <option value="AUD">A$ AUD</option>
+  <option value="CAD">C$ CAD</option>
+  <option value="SGD">S$ SGD</option>
+  <option value="AED">د.إ AED</option>
+  <option value="SAR">﷼ SAR</option>
+  <option value="BRL">R$ BRL</option>
+  <option value="MXN">Mex$ MXN</option>
+  <option value="NGN">₦ NGN</option>
+  <option value="KES">KSh KES</option>
+  <option value="ZAR">R ZAR</option>
+  <option value="EGP">E£ EGP</option>
+  <option value="CNY">¥ CNY</option>
+  <option value="KRW">₩ KRW</option>
+  <option value="IDR">Rp IDR</option>
+  <option value="PHP">₱ PHP</option>
+  <option value="VND">₫ VND</option>
+  <option value="THB">฿ THB</option>
+  <option value="NZD">NZ$ NZD</option>
+  <option value="ARS">AR$ ARS</option>
+</select>
               </div>
             </div>
 
