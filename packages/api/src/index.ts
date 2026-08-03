@@ -12,6 +12,7 @@ import razorpayRoutes from './routes/razorpay';
 import verificationRoutes from './routes/verification';
 import currencyRoutes from './routes/currency';
 import mediationRoutes from './routes/mediation';
+import milestoneRoutes from './routes/milestones';
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -237,5 +238,6 @@ app.use('/api/razorpay', razorpayRoutes);
 app.use('/api/verification', verificationRoutes);
 app.use('/api/mediation', mediationRoutes);
 app.use('/api/currency', currencyRoutes);
+app.use('/api/milestones', milestoneRoutes);
 
 app.listen(PORT, () => console.log('VouchAI running on port ' + PORT));

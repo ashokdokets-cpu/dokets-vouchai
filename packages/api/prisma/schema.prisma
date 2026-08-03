@@ -62,6 +62,26 @@ model Contract {
   payments    Payment[]
 }
 
+model Milestone {
+  id          String   @id @default(cuid())
+  contractId  String
+  contract    Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  amount      Float
+  percentage  Float
+  order       Int
+  status      String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, VERIFIED, DISPUTED
+  dueDate     DateTime?
+  completedAt DateTime?
+  verifiedAt  DateTime?
+  proofUrl    String?
+  aiVerified  Boolean  @default(false)
+  aiConfidence Float?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model Payment {
   id          String   @id @default(cuid())
   contractId  String
