@@ -35,6 +35,8 @@ export default function ProviderDashboard() {
             <Link href="/vouch-score" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50"><Star className="w-5 h-5" /> Vouch Score</Link>
             <Link href="/profile" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50"><User className="w-5 h-5" /> Profile</Link>
             <Link href="/settings" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50"><Settings className="w-5 h-5" /> Settings</Link>
+            <Link href="/applications" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50"><Briefcase className="w-5 h-5" /> My Applications</Link>
+            <Link href="/notifications" className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50"><Bell className="w-5 h-5" /> Notifications</Link>
           </nav>
         </aside>
         <div className="flex-1 lg:ml-64">

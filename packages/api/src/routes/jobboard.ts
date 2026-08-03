@@ -120,4 +120,21 @@ router.post('/', async (req: Request, res: Response) => {
   } catch (e: any) { res.status(500).json({ error: e.message }); }
 });
 
+// Get jobs a provider applied to
+router.get('/applied/:providerId', async (req: Request, res: Response) => {
+  try {
+    const contracts = await prisma.contract.findMany({
+      where: {
+        isPublic: true,
+        OR: [
+          { providerId: req.params.providerId },
+          { applicants: { contains: req.params.providerId } }
+        ]
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(contracts);
+  } catch (e: any) { res.status(500).json({ error: e.message }); }
+});
+
 export default router;

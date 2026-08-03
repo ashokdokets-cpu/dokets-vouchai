@@ -27,15 +27,17 @@ export default function HomePage() {
             </Link>
             
             <div className="hidden md:flex items-center gap-8">
-              <a href="#how-it-works" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">How It Works</a>
-              <a href="#features" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">Features</a>
-              <a href="#comparison" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">Compare</a>
-              <div className="h-5 w-px bg-gray-200"></div>
-              <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">Sign In</Link>
-              <Link href="/login" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md">
-                Get Started
-              </Link>
-            </div>
+  <a href="#how-it-works" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">How It Works</a>
+  <a href="#features" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">Features</a>
+  <a href="#comparison" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">Compare</a>
+  <Link href="/jobs" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">Find Work</Link>
+  <Link href="/jobs/post" className="text-sm text-gray-600 hover:text-blue-600 font-medium transition-colors">Post a Job</Link>
+  <div className="h-5 w-px bg-gray-200"></div>
+  <Link href="/login" className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors">Sign In</Link>
+  <Link href="/login" className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-all shadow-sm hover:shadow-md">
+    Get Started
+  </Link>
+</div>
 
             <button className="md:hidden p-2" onClick={() => setMobileMenu(!mobileMenu)}>
               {mobileMenu ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
