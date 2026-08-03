@@ -98,6 +98,8 @@ model Payment {
   currency    String
   gateway     String
   status      String
+  gatewayOrderId   String?
+  gatewayPaymentId String?
   platformFee Float
   gatewayFee  Float
   netAmount   Float
@@ -105,7 +107,6 @@ model Payment {
   toUserId    String
   createdAt   DateTime @default(now())
 }
-
 model Dispute {
   id          String   @id @default(cuid())
   contractId  String
