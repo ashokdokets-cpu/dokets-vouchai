@@ -7,13 +7,18 @@ import Link from 'next/link';
 
 export default function JobBoard() {
   const [jobs, setJobs] = useState<any[]>([]);
-  const [filter, setFilter] = useState({ jobType: '', country: '', category: '' });
+  const [filter, setFilter] = useState({ jobType: '', country: '', city: '', category: '' });
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    fetch('https://dokets-vouchai.onrender.com/api/jobs')
-      .then(r => r.json()).then(setJobs);
-  }, []);
+  const params = new URLSearchParams();
+  if (filter.jobType) params.append('jobType', filter.jobType);
+  if (filter.country) params.append('country', filter.country);
+  if (filter.city) params.append('city', filter.city);
+  
+  fetch('https://dokets-vouchai.onrender.com/api/jobs?' + params.toString())
+    .then(r => r.json()).then(setJobs);
+}, [filter]);
 
   const filtered = jobs.filter(j => {
     if (search && !j.title.toLowerCase().includes(search.toLowerCase())) return false;
@@ -41,7 +46,17 @@ export default function JobBoard() {
               <option value="LOCAL">🏠 Local</option>
               <option value="REMOTE">🌍 Remote</option>
               <option value="HYBRID">🔄 Hybrid</option>
-            </select>
+                        </select>
+            {filter.jobType !== 'REMOTE' && (
+              <>
+                <input type="text" placeholder="City" value={filter.city}
+                  onChange={e => setFilter({...filter, city: e.target.value})}
+                  className="px-4 py-3 border rounded-xl bg-white w-32" />
+                <input type="text" placeholder="Country" value={filter.country}
+                  onChange={e => setFilter({...filter, country: e.target.value})}
+                  className="px-4 py-3 border rounded-xl bg-white w-32" />
+              </>
+            )}
           </div>
         </div>
       </div>
