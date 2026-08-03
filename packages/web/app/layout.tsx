@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import GlobalNav from "@/components/GlobalNav";
 
 export const metadata: Metadata = {
   title: "VouchAI - Trust in Every Deal",
@@ -12,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="antialiased">
         <AuthProvider>
+          <GlobalNav />
           {children}
         </AuthProvider>
       </body>
