@@ -242,6 +242,7 @@ export default function HomePage() {
               <ul className="space-y-2 text-sm">
                 <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
                 <li><Link href="/why-dokets" className="hover:text-white transition-colors">Why Dokets</Link></li>
+                <li><a href="https://www.charvakit.com" target="_blank" className="hover:text-white transition-colors">Charvak IT Consulting</a></li>
                 <li><a href="https://www.doketsrb.com" target="_blank" className="hover:text-white transition-colors">Dokets Resume Builder</a></li>
                 <li><a href="https://www.dokets.shop" target="_blank" className="hover:text-white transition-colors">Dokets Shop</a></li>
               </ul>
@@ -265,7 +266,9 @@ export default function HomePage() {
             <p className="text-sm">Trust in Every Deal · AI-Powered Escrow Technology</p>
             <p className="text-xs mt-2 text-gray-600">© 2026 Charvak IT Consulting Pvt Ltd. All rights reserved.</p>
             <p className="text-xs mt-1 text-gray-600">
-              <a href="mailto:contact@dokets.com" className="hover:text-gray-400 transition-colors">contact@dokets.com</a>
+            <a href="mailto:contact@dokets.com" className="hover:text-gray-400 transition-colors">contact@dokets.com</a>
+            <span className="mx-2">|</span>
+            <a href="mailto:hr@charvakit.com" className="hover:text-gray-400 transition-colors">hr@charvakit.com</a>
             </p>
           </div>
         </div>
