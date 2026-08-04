@@ -50,7 +50,12 @@ export default function ShowcasePage() {
 
   const filtered = providers.filter(p => {
     if (search && !p.name?.toLowerCase().includes(search.toLowerCase()) && 
-        !p.skill?.toLowerCase().includes(search.toLowerCase())) return false;
+        !p.title?.toLowerCase().includes(search.toLowerCase())) return false;
+    if (activeTag !== 'All') {
+      const tagMatches = p.title?.toLowerCase().includes(activeTag.toLowerCase()) ||
+                         p.vouchTier?.toLowerCase().includes(activeTag.toLowerCase());
+      if (!tagMatches) return false;
+    }
     return true;
   });
 
