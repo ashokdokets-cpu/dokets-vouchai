@@ -1,54 +1,97 @@
 'use client';
 
 import { useState } from 'react';
-import { Award, CheckCircle, Star, TrendingUp } from 'lucide-react';
+import { Award, CheckCircle, Star, TrendingUp, ArrowRight, Clock, X } from 'lucide-react';
 
-const skillTests = [
-  // Home Services
-  { id: 'painting', name: '🎨 Painting Skills', questions: 10, time: '10 min', category: 'Home Services' },
-  { id: 'plumbing', name: '🔧 Plumbing Basics', questions: 15, time: '15 min', category: 'Home Services' },
-  { id: 'electrical', name: '⚡ Electrical Knowledge', questions: 15, time: '15 min', category: 'Home Services' },
-  { id: 'carpentry', name: '🪚 Carpentry Skills', questions: 12, time: '12 min', category: 'Home Services' },
-  
-  // Languages
-  { id: 'english', name: '📝 English Communication', questions: 20, time: '20 min', category: 'Language' },
-  { id: 'spanish', name: '📝 Spanish (Español)', questions: 20, time: '20 min', category: 'Language' },
-  { id: 'french', name: '📝 French (Français)', questions: 20, time: '20 min', category: 'Language' },
-  { id: 'arabic', name: '📝 Arabic (العربية)', questions: 20, time: '20 min', category: 'Language' },
-  { id: 'portuguese', name: '📝 Portuguese (Português)', questions: 20, time: '20 min', category: 'Language' },
-  { id: 'mandarin', name: '📝 Mandarin Chinese', questions: 20, time: '20 min', category: 'Language' },
-  { id: 'japanese', name: '📝 Japanese (日本語)', questions: 20, time: '20 min', category: 'Language' },
-  { id: 'hindi', name: '📝 Hindi Communication', questions: 20, time: '20 min', category: 'Language' },
-  
-  // Software & Tech
-  { id: 'excel', name: '📊 MS Excel', questions: 15, time: '15 min', category: 'Software' },
-  { id: 'typing', name: '⌨️ Typing Speed', questions: 1, time: '5 min', category: 'Software' },
-  { id: 'web-dev', name: '💻 Web Development', questions: 20, time: '20 min', category: 'Software' },
-  { id: 'python', name: '🐍 Python Programming', questions: 15, time: '15 min', category: 'Software' },
-  { id: 'graphic-design', name: '🎨 Graphic Design', questions: 15, time: '15 min', category: 'Software' },
-  { id: 'video-editing', name: '🎥 Video Editing', questions: 12, time: '12 min', category: 'Software' },
-  { id: 'seo', name: '🔍 SEO Basics', questions: 15, time: '15 min', category: 'Software' },
-  
-  // Personal Services
-  { id: 'cooking', name: '🍳 Cooking Basics', questions: 10, time: '10 min', category: 'Personal Services' },
-  { id: 'driving', name: '🚗 Driving Knowledge', questions: 15, time: '15 min', category: 'Transport' },
-  { id: 'fitness', name: '💪 Fitness Training', questions: 12, time: '12 min', category: 'Personal Services' },
-  { id: 'beauty', name: '💇 Beauty & Salon', questions: 10, time: '10 min', category: 'Personal Services' },
-  { id: 'photography', name: '📸 Photography Basics', questions: 12, time: '12 min', category: 'Personal Services' },
-  
-  // Business
-  { id: 'customer-service', name: '🎧 Customer Service', questions: 15, time: '15 min', category: 'Business' },
-  { id: 'sales', name: '💼 Sales Skills', questions: 15, time: '15 min', category: 'Business' },
-  { id: 'accounting', name: '📋 Basic Accounting', questions: 15, time: '15 min', category: 'Business' },
+const QUESTIONS: Record<string, { q: string; options: string[]; answer: number }[]> = {
+  english: [
+    { q: 'What is the correct spelling?', options: ['Recieve', 'Receive', 'Recive', 'Receeve'], answer: 1 },
+    { q: 'Choose the correct sentence:', options: ['He go to school', 'He goes to school', 'He going to school', 'He gone to school'], answer: 1 },
+    { q: 'What is a synonym for "happy"?', options: ['Sad', 'Angry', 'Joyful', 'Tired'], answer: 2 },
+    { q: '"Break a leg" means:', options: ['Injury', 'Good luck', 'Bad luck', 'Dance'], answer: 1 },
+    { q: 'Past tense of "run":', options: ['Runed', 'Ran', 'Running', 'Runned'], answer: 1 },
+  ],
+  painting: [
+    { q: 'Which paint finish is best for bathrooms?', options: ['Matte', 'Eggshell', 'Semi-gloss', 'Flat'], answer: 2 },
+    { q: 'What is primer used for?', options: ['Final coat', 'Surface preparation', 'Cleaning', 'Decoration'], answer: 1 },
+    { q: 'How many coats of paint are typically recommended?', options: ['1', '2', '3', '4'], answer: 1 },
+  ],
+  excel: [
+    { q: 'What does VLOOKUP do?', options: ['Creates charts', 'Searches for values', 'Formats cells', 'Prints documents'], answer: 1 },
+    { q: 'Which formula adds numbers?', options: ['=AVERAGE()', '=SUM()', '=COUNT()', '=MAX()'], answer: 1 },
+    { q: 'What is a Pivot Table used for?', options: ['Data summarization', 'Text editing', 'Image insertion', 'Password protection'], answer: 0 },
+  ],
+  typing: [
+    { q: 'This is a timed typing test. Type the following sentence as fast as you can:', options: ['Start Typing Test'], answer: 0 },
+  ],
+};
+
+const DEFAULT_QUESTIONS = [
+  { q: 'What is the most important factor in this skill?', options: ['Quality', 'Speed', 'Cost', 'Experience'], answer: 0 },
+  { q: 'How do you ensure customer satisfaction?', options: ['Listen to needs', 'Work fast', 'Charge less', 'Work alone'], answer: 0 },
+  { q: 'What is the best way to improve?', options: ['Practice daily', 'Watch videos', 'Read books', 'Wait for opportunities'], answer: 0 },
 ];
 
 export default function SkillsPage() {
   const [certified, setCertified] = useState<string[]>([]);
+  const [activeTest, setActiveTest] = useState<string | null>(null);
+  const [currentQ, setCurrentQ] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const [answers, setAnswers] = useState<number[]>([]);
 
-  const takeTest = (skillId: string) => {
-    // Simulate test completion
-    setCertified([...certified, skillId]);
-    alert('Test completed! You scored 92%. Badge earned! 🏆');
+  const skillTests = [
+    { id: 'english', name: '📝 English', questions: 5, time: '5 min', category: 'Language' },
+    { id: 'spanish', name: '📝 Spanish', questions: 5, time: '5 min', category: 'Language' },
+    { id: 'french', name: '📝 French', questions: 5, time: '5 min', category: 'Language' },
+    { id: 'arabic', name: '📝 Arabic', questions: 5, time: '5 min', category: 'Language' },
+    { id: 'hindi', name: '📝 Hindi', questions: 5, time: '5 min', category: 'Language' },
+    { id: 'painting', name: '🎨 Painting', questions: 3, time: '3 min', category: 'Home Services' },
+    { id: 'plumbing', name: '🔧 Plumbing', questions: 5, time: '5 min', category: 'Home Services' },
+    { id: 'excel', name: '📊 MS Excel', questions: 3, time: '3 min', category: 'Software' },
+    { id: 'typing', name: '⌨️ Typing Speed', questions: 1, time: '2 min', category: 'Software' },
+    { id: 'python', name: '🐍 Python', questions: 5, time: '5 min', category: 'Software' },
+    { id: 'web-dev', name: '💻 Web Dev', questions: 5, time: '5 min', category: 'Software' },
+    { id: 'cooking', name: '🍳 Cooking', questions: 5, time: '5 min', category: 'Personal Services' },
+    { id: 'driving', name: '🚗 Driving', questions: 5, time: '5 min', category: 'Transport' },
+    { id: 'fitness', name: '💪 Fitness', questions: 5, time: '5 min', category: 'Personal Services' },
+    { id: 'photography', name: '📸 Photography', questions: 5, time: '5 min', category: 'Personal Services' },
+    { id: 'customer-service', name: '🎧 Customer Service', questions: 5, time: '5 min', category: 'Business' },
+    { id: 'sales', name: '💼 Sales', questions: 5, time: '5 min', category: 'Business' },
+  ];
+
+  const startTest = (skillId: string) => {
+    setActiveTest(skillId);
+    setCurrentQ(0);
+    setScore(0);
+    setAnswers([]);
+    setShowResult(false);
+  };
+
+  const questions = QUESTIONS[activeTest || ''] || DEFAULT_QUESTIONS;
+
+  const handleAnswer = (answerIndex: number) => {
+    const newAnswers = [...answers, answerIndex];
+    setAnswers(newAnswers);
+    
+    if (answerIndex === questions[currentQ].answer) {
+      setScore(score + 1);
+    }
+
+    if (currentQ + 1 < questions.length) {
+      setCurrentQ(currentQ + 1);
+    } else {
+      setShowResult(true);
+      const finalScore = Math.round(((score + (answerIndex === questions[currentQ].answer ? 1 : 0)) / questions.length) * 100);
+      if (finalScore >= 70 && !certified.includes(activeTest!)) {
+        setCertified([...certified, activeTest!]);
+      }
+    }
+  };
+
+  const closeTest = () => {
+    setActiveTest(null);
+    setShowResult(false);
   };
 
   return (
@@ -57,16 +100,61 @@ export default function SkillsPage() {
         <div className="text-center mb-12">
           <Award className="w-16 h-16 text-blue-600 mx-auto mb-4" />
           <h1 className="text-4xl font-bold">Skill Tests</h1>
-          <p className="text-xl text-gray-500 mt-2">Get certified and stand out from the competition</p>
+          <p className="text-xl text-gray-500 mt-2">Get certified and stand out globally</p>
           <div className="flex items-center justify-center gap-4 mt-4">
-            <div className="bg-blue-50 px-4 py-2 rounded-full text-sm text-blue-700">
-              🏆 {certified.length} Certifications
-            </div>
-            <div className="bg-green-50 px-4 py-2 rounded-full text-sm text-green-700">
-              ⭐ Boosts Vouch Score
-            </div>
+            <div className="bg-blue-50 px-4 py-2 rounded-full text-sm text-blue-700">🏆 {certified.length} Certifications</div>
+            <div className="bg-green-50 px-4 py-2 rounded-full text-sm text-green-700">⭐ +25 Vouch Score each</div>
           </div>
         </div>
+
+        {/* Test Modal */}
+        {activeTest && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+              {!showResult ? (
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="font-semibold text-lg">{skillTests.find(t => t.id === activeTest)?.name}</h3>
+                      <p className="text-sm text-gray-500">Question {currentQ + 1} of {questions.length}</p>
+                    </div>
+                    <button onClick={closeTest} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5" /></button>
+                  </div>
+                  <div className="h-2 bg-gray-200 rounded-full mb-6">
+                    <div className="h-2 bg-blue-600 rounded-full transition-all" style={{ width: `${((currentQ) / questions.length) * 100}%` }} />
+                  </div>
+                  <p className="text-lg font-medium mb-4">{questions[currentQ].q}</p>
+                  <div className="space-y-3">
+                    {questions[currentQ].options.map((opt, i) => (
+                      <button key={i} onClick={() => handleAnswer(i)}
+                        className="w-full text-left p-4 rounded-xl border hover:border-blue-400 hover:bg-blue-50 transition-all text-sm">
+                        {String.fromCharCode(65 + i)}. {opt}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-6">
+                  <div className="text-6xl mb-4">{Math.round((score / questions.length) * 100) >= 70 ? '🎉' : '📚'}</div>
+                  <h2 className="text-2xl font-bold mb-2">
+                    {Math.round((score / questions.length) * 100) >= 70 ? 'Test Passed!' : 'Keep Learning!'}
+                  </h2>
+                  <p className="text-4xl font-bold text-blue-600 mb-2">{Math.round((score / questions.length) * 100)}%</p>
+                  <p className="text-gray-500 mb-4">{score}/{questions.length} correct</p>
+                  {Math.round((score / questions.length) * 100) >= 70 && (
+                    <div className="bg-green-50 text-green-700 px-4 py-2 rounded-xl inline-block text-sm font-medium mb-4">
+                      ✅ Certified! +25 Vouch Score
+                    </div>
+                  )}
+                  <button onClick={closeTest}
+                    className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700">
+                    Close
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Why take tests */}
         <div className="bg-white rounded-2xl p-6 border mb-8">
@@ -94,15 +182,13 @@ export default function SkillsPage() {
               <h3 className="font-semibold">{test.name}</h3>
               <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                 <span>📝 {test.questions} Q</span>
-                <span>⏱️ {test.time}</span>
+                <span><Clock className="w-3 h-3 inline" /> {test.time}</span>
               </div>
               <div className="text-xs text-gray-400 mt-1">{test.category}</div>
               {certified.includes(test.id) ? (
-                <div className="mt-4 bg-green-100 text-green-700 px-4 py-2 rounded-xl text-sm font-medium text-center">
-                  ✅ Certified
-                </div>
+                <div className="mt-4 bg-green-100 text-green-700 px-4 py-2 rounded-xl text-sm font-medium text-center">✅ Certified</div>
               ) : (
-                <button onClick={() => takeTest(test.id)}
+                <button onClick={() => startTest(test.id)}
                   className="mt-4 w-full bg-blue-600 text-white py-2 rounded-xl text-sm font-medium hover:bg-blue-700">
                   Take Test
                 </button>
