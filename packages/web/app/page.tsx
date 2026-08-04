@@ -264,6 +264,12 @@ export default function HomePage() {
               <span className="text-lg font-bold text-white">Dokets VouchAI</span>
             </div>
             <p className="text-sm">Trust in Every Deal · AI-Powered Escrow Technology</p>
+         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-center">
+            <p className="text-sm text-blue-800">
+             📱 <strong>First time?</strong> Send 'Hi' to <strong>+12232264859</strong> on WhatsApp to activate your account.
+            <a href="/help" className="text-blue-600 hover:underline ml-2">Learn more →</a>
+            </p>
+         </div>
             <p className="text-xs mt-2 text-gray-600">© 2026 Charvak IT Consulting Pvt Ltd. All rights reserved.</p>
             <p className="text-xs mt-1 text-gray-600">
             <a href="mailto:contact@dokets.com" className="hover:text-gray-400 transition-colors">contact@dokets.com</a>
