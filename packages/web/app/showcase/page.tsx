@@ -4,17 +4,46 @@ import { useState, useEffect } from 'react';
 import { Search, Star, MapPin, Globe, Briefcase, Plus, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
+function getSampleProviders() {
+  return [
+    { id: '1', name: 'Ramesh Kumar', title: 'Custom Furniture Making', location: 'Mumbai, India', vouchScore: 95, vouchTier: 'GOLD' },
+    { id: '2', name: 'Maria Santos', title: 'Brazilian Waxing', location: 'Sao Paulo, Brazil', vouchScore: 92, vouchTier: 'GOLD' },
+    { id: '3', name: 'Ahmed Hassan', title: 'Arabic Calligraphy', location: 'Dubai, UAE', vouchScore: 88, vouchTier: 'SILVER' },
+    { id: '4', name: 'Priya Sharma', title: 'Yoga Instructor', location: 'Delhi, India', vouchScore: 94, vouchTier: 'GOLD' },
+    { id: '5', name: 'Carlos Mendoza', title: 'Salsa Dance Lessons', location: 'Mexico City, Mexico', vouchScore: 90, vouchTier: 'GOLD' },
+    { id: '6', name: 'Wei Chen', title: 'Mandarin Tutoring', location: 'Singapore', vouchScore: 96, vouchTier: 'PLATINUM' },
+    { id: '7', name: 'Fatima Ali', title: 'Henna Artist', location: 'Karachi, Pakistan', vouchScore: 89, vouchTier: 'SILVER' },
+    { id: '8', name: 'John Smith', title: 'Voice Over Artist', location: 'London, UK', vouchScore: 91, vouchTier: 'GOLD' },
+    { id: '9', name: 'Yuki Tanaka', title: 'Sushi Chef', location: 'Tokyo, Japan', vouchScore: 93, vouchTier: 'GOLD' },
+  ];
+}
+
 export default function ShowcasePage() {
   const [search, setSearch] = useState('');
   const [activeTag, setActiveTag] = useState('All');
   const [providers, setProviders] = useState<any[]>([]);
 
   useEffect(() => {
-    // Fetch real providers from API
-    fetch('https://dokets-vouchai.onrender.com/api/users')
-      .then(r => r.json()).then(data => {
-        if (Array.isArray(data)) setProviders(data.slice(0, 20));
-      }).catch(() => {});
+    // Try to get real users, fallback to sample data
+    fetch('https://dokets-vouchai.onrender.com/api/users/phone/+919100014859')
+      .then(r => r.json()).then(user => {
+        if (user.id) {
+          // Get contracts to find providers
+          fetch('https://dokets-vouchai.onrender.com/api/jobs')
+            .then(r => r.json()).then(jobs => {
+              if (Array.isArray(jobs) && jobs.length > 0) {
+                const providers = jobs.filter((j: any) => j.provider).map((j: any) => ({
+                  id: j.provider?.id || j.id,
+                  name: j.provider?.name || 'Provider',
+                  vouchScore: j.provider?.vouchScore || 100,
+                  title: j.title,
+                  location: j.location || 'Global'
+                }));
+                setProviders(providers.slice(0, 12));
+              }
+            }).catch(() => setProviders(getSampleProviders()));
+        }
+      }).catch(() => setProviders(getSampleProviders()));
   }, []);
 
   const tags = ['All', 'Development', 'Design', 'Writing', 'Marketing', 'Music', 'Education', 'Health', 'Home Services', 'Custom'];
@@ -109,9 +138,9 @@ export default function ShowcasePage() {
             <Globe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">No providers found for "{search}"</p>
             <p className="text-gray-400 text-sm mt-1">Try a different search or be the first to showcase this skill!</p>
-            <Link href="/jobs/post" className="text-blue-600 hover:underline mt-4 inline-block font-medium">
-              Be the first →
-            </Link>
+            <Link href={`/jobs/post?skill=${encodeURIComponent(search)}`} className="text-blue-600 hover:underline mt-4 inline-block font-medium">
+            Post a job for "{search}" →
+          </Link>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
