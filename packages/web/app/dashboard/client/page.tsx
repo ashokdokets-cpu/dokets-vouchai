@@ -14,6 +14,7 @@ import {
 export default function ClientDashboard() {
   const { user, loading, logout } = useAuth();
   const [contracts, setContracts] = useState<any[]>([]);
+  const [payments, setPayments] = useState<Record<string, any>>({});
   const [filter, setFilter] = useState('all');
   const router = useRouter();
 
@@ -30,6 +31,22 @@ export default function ClientDashboard() {
   const activeContracts = contracts.filter(c => c.status === 'ACTIVE' || c.status === 'PENDING_ACCEPTANCE');
   const completedContracts = contracts.filter(c => c.status === 'COMPLETED');
   const totalSpent = contracts.reduce((s, c) => s + (c.totalPaid || c.amount || 0), 0);
+const handleReleasePayment = async (paymentId: string) => {
+  if (!confirm('Release payment to provider? This cannot be undone.')) return;
+  const res = await fetch('https://dokets-vouchai.onrender.com/api/razorpay/trigger-payout', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ paymentId, clientId: user.id })
+  });
+  const data = await res.json();
+  if (data.success) { alert('✅ Payment released!'); window.location.reload(); }
+  else { alert('❌ ' + (data.error || 'Failed')); }
+};
+
+const fetchPaymentStatus = async (contractId: string) => {
+  const res = await fetch('https://dokets-vouchai.onrender.com/api/payments/contract/' + contractId);
+  const data = await res.json();
+  if (data.length > 0) setPayments(prev => ({ ...prev, [contractId]: data[data.length - 1] }));
+};
   const filtered = filter === 'active' ? activeContracts : filter === 'completed' ? completedContracts : contracts;
 
   return (
@@ -115,6 +132,15 @@ export default function ClientDashboard() {
                           <span>📅 {new Date(contract.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                           {contract.provider && <span>🔧 {contract.provider.name}</span>}
                         </div>
+                          {/* Add inside the contract card, after the status badge */}
+{payments[contract.id]?.status === 'HELD' && contract.clientId === user.id && (
+  <button
+    onClick={() => handleReleasePayment(payments[contract.id].id)}
+    className="mt-3 bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-green-700 transition-all shadow-sm"
+  >
+    💰 Release Payment
+  </button>
+)}
                       </div>
                       <Link href={`/contracts/${contract.id}`}><ChevronRight className="w-5 h-5 text-gray-300 flex-shrink-0" /></Link>
                     </div>

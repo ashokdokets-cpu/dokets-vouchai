@@ -19,6 +19,8 @@ import emailRoutes from './routes/email';
 import subscriptionRoutes from './routes/subscriptions';
 import disputeFeeRoutes from './routes/dispute-fees';
 import payoutRoutes from './routes/payouts';
+import razorpayPayoutRoutes from './routes/razorpay-payout';
+import razorpayWebhookRoutes from './routes/razorpay-webhook';
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -251,5 +253,7 @@ app.use('/api/email', emailRoutes);
 app.use('/api/subscriptions', subscriptionRoutes);
 app.use('/api/dispute-fees', disputeFeeRoutes);
 app.use('/api/payouts', payoutRoutes);
+app.use('/api/razorpay', razorpayPayoutRoutes);
+app.use('/api/razorpay', razorpayWebhookRoutes);
 
 app.listen(PORT, () => console.log('VouchAI running on port ' + PORT));
