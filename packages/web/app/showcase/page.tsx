@@ -108,8 +108,8 @@ export default function ShowcasePage() {
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8 mb-8 text-center border-2 border-dashed border-blue-300">
           <h2 className="text-2xl font-bold mb-2">🌟 Showcase Your Skill</h2>
           <p className="text-gray-600 mb-4">List your unique talent and get discovered by clients worldwide</p>
-          <Link href="/jobs/post?type=showcase" className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 inline-flex items-center gap-2">
-            <Plus className="w-5 h-5" /> Add Your Skill
+          <Link href="/jobs/post" className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 inline-flex items-center gap-2">
+          <Plus className="w-5 h-5" /> Add Your Skill
           </Link>
         </div>
 
