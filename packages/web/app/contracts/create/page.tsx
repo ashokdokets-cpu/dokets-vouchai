@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { 
+import { useAuth } from '@/context/AuthContext';
+import {
   ArrowRight, ArrowLeft, Check, Shield, Sparkles,
-  CreditCard, Calendar, MapPin, Phone, User, FileText,
-  Briefcase, DollarSign
+  Calendar, MapPin, Phone, User, FileText,
+  Briefcase, DollarSign, Globe
 } from 'lucide-react';
 
 const SERVICES = [
@@ -17,29 +18,68 @@ const SERVICES = [
   { id: 'carpentry', icon: '🪚', name: 'Carpentry', cat: 'Home' },
   { id: 'tutoring', icon: '📚', name: 'Tutoring', cat: 'Education' },
   { id: 'driving', icon: '🚗', name: 'Driving', cat: 'Transport' },
-  { id: 'photography', icon: '📸', name: 'Photography', cat: 'Events' },
+  { id: 'photography', icon: '📸', name: 'Photography', cat: 'Creative' },
   { id: 'catering', icon: '🍽️', name: 'Catering', cat: 'Events' },
   { id: 'development', icon: '💻', name: 'Development', cat: 'Tech' },
   { id: 'design', icon: '🎨', name: 'Design', cat: 'Tech' },
   { id: 'delivery', icon: '📦', name: 'Delivery', cat: 'Logistics' },
+  { id: 'writing', icon: '✍️', name: 'Writing', cat: 'Creative' },
+  { id: 'music', icon: '🎵', name: 'Music', cat: 'Creative' },
+  { id: 'fitness', icon: '💪', name: 'Fitness', cat: 'Personal' },
+  { id: 'beauty', icon: '💇', name: 'Beauty', cat: 'Personal' },
+  { id: 'legal', icon: '⚖️', name: 'Legal', cat: 'Business' },
+  { id: 'accounting', icon: '📋', name: 'Accounting', cat: 'Business' },
+  { id: 'translation', icon: '🌐', name: 'Translation', cat: 'Business' },
+  { id: 'custom', icon: '✨', name: 'Custom', cat: 'Other' },
+];
+
+const CURRENCIES = [
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'GBP', symbol: '£', name: 'British Pound' },
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
+  { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' },
+  { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' },
+  { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' },
+  { code: 'SAR', symbol: '﷼', name: 'Saudi Riyal' },
+  { code: 'BRL', symbol: 'R$', name: 'Brazilian Real' },
+  { code: 'MXN', symbol: 'Mex$', name: 'Mexican Peso' },
+  { code: 'NGN', symbol: '₦', name: 'Nigerian Naira' },
+  { code: 'KES', symbol: 'KSh', name: 'Kenyan Shilling' },
+  { code: 'ZAR', symbol: 'R', name: 'South African Rand' },
+  { code: 'EGP', symbol: 'E£', name: 'Egyptian Pound' },
+  { code: 'CNY', symbol: '¥', name: 'Chinese Yuan' },
+  { code: 'KRW', symbol: '₩', name: 'Korean Won' },
+  { code: 'IDR', symbol: 'Rp', name: 'Indonesian Rupiah' },
+  { code: 'PHP', symbol: '₱', name: 'Philippine Peso' },
+  { code: 'VND', symbol: '₫', name: 'Vietnamese Dong' },
+  { code: 'THB', symbol: '฿', name: 'Thai Baht' },
+  { code: 'NZD', symbol: 'NZ$', name: 'New Zealand Dollar' },
+  { code: 'ARS', symbol: 'AR$', name: 'Argentine Peso' },
 ];
 
 const STEPS = ['Details', 'Service', 'Payment', 'Done'];
+const COUNTRIES = ['IN', 'US', 'GB', 'AE', 'SA', 'SG', 'JP', 'CN', 'KR', 'ID', 'TH', 'PH', 'VN', 'AU', 'NZ', 'BR', 'MX', 'AR', 'CA', 'NG', 'KE', 'ZA', 'EG', 'DE', 'FR', 'ES'];
 
 export default function CreateContractPage() {
+  const { user } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
-    clientPhone: '', clientName: '',
+    clientPhone: user?.phone || '', clientName: user?.name || '',
     providerPhone: '', providerName: '',
     service: '', title: '', description: '',
     amount: '', currency: 'INR',
-    deadline: '', location: '',
+    deadline: '', location: '', country: 'IN',
+    customService: '',
   });
   const [contract, setContract] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
   const updateForm = (field: string, value: string) => setForm(f => ({ ...f, [field]: value }));
+  const getCurrencySymbol = (code: string) => CURRENCIES.find(c => c.code === code)?.symbol || code;
   const canNext = () => {
     if (step === 1) return form.clientPhone && form.providerPhone;
     if (step === 2) return form.service && form.title;
@@ -47,23 +87,36 @@ export default function CreateContractPage() {
     return true;
   };
 
+  const calculateFee = (amount: number, currency: string) => {
+    if (amount <= 0) return 0;
+    if (currency === 'INR') {
+      if (amount <= 2000) return 20;
+      if (amount <= 10000) return Math.round(amount * 0.02);
+      if (amount <= 50000) return Math.round(amount * 0.015);
+      return Math.round(amount * 0.01);
+    }
+    return Math.round(amount * 0.02);
+  };
+
   const handleCreate = async () => {
     setLoading(true);
     try {
       const cr = await fetch('https://dokets-vouchai.onrender.com/api/users/register', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: form.clientPhone, name: form.clientName || 'Client', country: 'IN', language: 'en' })
+        body: JSON.stringify({ phone: form.clientPhone, name: form.clientName || 'Client', country: form.country, language: 'en' })
       });
       const client = (await cr.json()).user;
+
+      const serviceName = form.service === 'custom' ? form.customService : form.service;
 
       const res = await fetch('https://dokets-vouchai.onrender.com/api/contracts', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: form.title, description: form.description, category: form.service,
+          title: form.title, description: form.description, category: serviceName,
           amount: Number(form.amount), currency: form.currency, clientId: client.id,
           providerPhone: form.providerPhone,
           deadline: new Date(form.deadline).toISOString(),
-          location: form.location, country: 'IN', language: 'en'
+          location: form.location, country: form.country, language: 'en'
         })
       });
       setContract((await res.json()).contract);
@@ -80,10 +133,12 @@ export default function CreateContractPage() {
     alert('Payment secured in escrow!');
   };
 
+  const fee = calculateFee(Number(form.amount) || 0, form.currency);
+  const sym = getCurrencySymbol(form.currency);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-8 px-4">
       <div className="max-w-2xl mx-auto">
-        {/* Progress Bar */}
         <div className="flex items-center justify-center gap-1 mb-10">
           {STEPS.map((s, i) => (
             <div key={i} className="flex items-center">
@@ -110,41 +165,46 @@ export default function CreateContractPage() {
             {step === 1 && (
               <div className="space-y-4">
                 <div className="bg-blue-50 rounded-2xl p-4 mb-4">
-                  <div className="flex items-center gap-2 text-blue-700 text-sm font-medium">
-                    <User className="w-4 h-4" /> Your Details (Client)
-                  </div>
+                  <div className="flex items-center gap-2 text-blue-700 text-sm font-medium"><User className="w-4 h-4" /> Your Details (Client)</div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="text-xs font-medium text-gray-600 mb-1 block">Phone *</label>
-                    <input type="text" placeholder="+91 98765 43210" value={form.clientPhone}
+                    <input type="text" placeholder="+1 234 567 8900" value={form.clientPhone}
                       onChange={e => updateForm('clientPhone', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
+                      className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-600 mb-1 block">Name</label>
                     <input type="text" placeholder="Your name" value={form.clientName}
                       onChange={e => updateForm('clientName', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
-                  </div>
-                </div>
-                <div className="bg-purple-50 rounded-2xl p-4">
-                  <div className="flex items-center gap-2 text-purple-700 text-sm font-medium">
-                    <Briefcase className="w-4 h-4" /> Provider Details
+                      className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
+                    <label className="text-xs font-medium text-gray-600 mb-1 block">Country</label>
+                    <select value={form.country} onChange={e => updateForm('country', e.target.value)}
+                      className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                      {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                </div>
+                <div className="bg-purple-50 rounded-2xl p-4">
+                  <div className="flex items-center gap-2 text-purple-700 text-sm font-medium"><Briefcase className="w-4 h-4" /> Provider Details</div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
                     <label className="text-xs font-medium text-gray-600 mb-1 block">Phone *</label>
-                    <input type="text" placeholder="+91 98765 43210" value={form.providerPhone}
+                    <input type="text" placeholder="+1 234 567 8900" value={form.providerPhone}
                       onChange={e => updateForm('providerPhone', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none text-sm" />
+                      className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-purple-500 outline-none text-sm" />
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-600 mb-1 block">Name</label>
                     <input type="text" placeholder="Provider name" value={form.providerName}
                       onChange={e => updateForm('providerName', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none text-sm" />
+                      className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-purple-500 outline-none text-sm" />
                   </div>
                 </div>
               </div>
@@ -164,17 +224,22 @@ export default function CreateContractPage() {
                     </button>
                   ))}
                 </div>
+                {form.service === 'custom' && (
+                  <input type="text" placeholder="Enter your custom service..." value={form.customService}
+                    onChange={e => updateForm('customService', e.target.value)}
+                    className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
+                )}
                 <div className="pt-4">
                   <label className="text-xs font-medium text-gray-600 mb-1 block">Work Title *</label>
                   <input type="text" placeholder="e.g., Living Room Painting" value={form.title}
                     onChange={e => updateForm('title', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
+                    className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-600 mb-1 block">Description</label>
                   <textarea placeholder="Describe the work in detail..." value={form.description}
                     onChange={e => updateForm('description', e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm h-20 resize-none" />
+                    className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm h-20 resize-none" />
                 </div>
               </div>
             )}
@@ -184,39 +249,16 @@ export default function CreateContractPage() {
                 <div className="grid grid-cols-3 gap-3">
                   <div className="col-span-2">
                     <label className="text-xs font-medium text-gray-600 mb-1 block">Amount *</label>
-                    <input type="number" placeholder="15000" value={form.amount}
+                    <input type="number" placeholder="5000" value={form.amount}
                       onChange={e => updateForm('amount', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-lg font-semibold" />
+                      className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-lg font-semibold" />
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-600 mb-1 block">Currency</label>
-                    <select value={form.currency} onChange={e => setForm({...form, currency: e.target.value})}
-  className="w-full px-3 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">
-  <option value="INR">₹ INR</option>
-  <option value="USD">$ USD</option>
-  <option value="EUR">€ EUR</option>
-  <option value="GBP">£ GBP</option>
-  <option value="JPY">¥ JPY</option>
-  <option value="AUD">A$ AUD</option>
-  <option value="CAD">C$ CAD</option>
-  <option value="SGD">S$ SGD</option>
-  <option value="AED">د.إ AED</option>
-  <option value="SAR">﷼ SAR</option>
-  <option value="BRL">R$ BRL</option>
-  <option value="MXN">Mex$ MXN</option>
-  <option value="NGN">₦ NGN</option>
-  <option value="KES">KSh KES</option>
-  <option value="ZAR">R ZAR</option>
-  <option value="EGP">E£ EGP</option>
-  <option value="CNY">¥ CNY</option>
-  <option value="KRW">₩ KRW</option>
-  <option value="IDR">Rp IDR</option>
-  <option value="PHP">₱ PHP</option>
-  <option value="VND">₫ VND</option>
-  <option value="THB">฿ THB</option>
-  <option value="NZD">NZ$ NZD</option>
-  <option value="ARS">AR$ ARS</option>
-</select>
+                    <select value={form.currency} onChange={e => updateForm('currency', e.target.value)}
+                      className="w-full px-3 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                      {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.symbol} {c.code}</option>)}
+                    </select>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -224,23 +266,23 @@ export default function CreateContractPage() {
                     <label className="text-xs font-medium text-gray-600 mb-1 block">Deadline *</label>
                     <input type="datetime-local" value={form.deadline}
                       onChange={e => updateForm('deadline', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
+                      className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-600 mb-1 block">Location</label>
-                    <input type="text" placeholder="Mumbai, India" value={form.location}
+                    <input type="text" placeholder="City, Country" value={form.location}
                       onChange={e => updateForm('location', e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
+                      className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
                   </div>
                 </div>
                 <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4">
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Platform Fee (1%)</span>
-                    <span className="font-semibold">₹{Math.round((Number(form.amount) || 0) * 0.01).toLocaleString()}</span>
+                    <span className="text-gray-600">Platform Fee</span>
+                    <span className="font-semibold">{sym}{fee.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">You Pay</span>
-                    <span className="font-bold text-lg">₹{(Number(form.amount) || 0).toLocaleString()}</span>
+                    <span className="font-bold text-lg">{sym}{(Number(form.amount) || 0).toLocaleString()}</span>
                   </div>
                   <div className="flex items-center gap-1 mt-2 text-xs text-blue-600">
                     <Shield className="w-3 h-3" /> Secured in escrow
@@ -272,7 +314,6 @@ export default function CreateContractPage() {
             )}
           </AnimatePresence>
 
-          {/* Navigation Buttons */}
           {step < 4 && (
             <div className="flex gap-3 mt-8">
               {step > 1 && (
