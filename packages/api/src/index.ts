@@ -168,8 +168,10 @@ const otpStore: Map<string, { code: string; expires: number }> = new Map();
 
 // Send OTP
 app.post('/api/auth/send-otp', async (req, res) => {
-  const { phone } = req.body;
+  let { phone } = req.body;
   if (!phone) return res.status(400).json({ error: 'Phone required' });
+  phone = phone.replace(/[\s\-\(\)]/g, '');
+  if (!phone.startsWith('+')) phone = '+' + phone;
   
   const code = Math.floor(100000 + Math.random() * 900000).toString();
   otpStore.set(phone, { code, expires: Date.now() + 300000 }); // 5 min expiry
