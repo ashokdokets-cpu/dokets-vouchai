@@ -38,9 +38,9 @@ export default function LoginPage() {
   if (!code || code.length !== 6) return setError('Enter 6-digit code');
   setLoading(true);
   setError('');
-  const success = await verifyOTP(cleanPhone, code);
+  const success = await verifyOTP(cleaned, code);
   if (success) {
-    const res = await fetch('https://dokets-vouchai.onrender.com/api/users/phone/' + cleanPhone);
+    const res = await fetch('https://dokets-vouchai.onrender.com/api/users/phone/' + cleaned);
     const userData = await res.json();
     setUserId(userData.id);
     if (userData.name && userData.name.startsWith('User')) {
