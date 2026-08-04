@@ -4,14 +4,42 @@ import { useState } from 'react';
 import { Award, CheckCircle, Star, TrendingUp } from 'lucide-react';
 
 const skillTests = [
+  // Home Services
   { id: 'painting', name: '🎨 Painting Skills', questions: 10, time: '10 min', category: 'Home Services' },
   { id: 'plumbing', name: '🔧 Plumbing Basics', questions: 15, time: '15 min', category: 'Home Services' },
+  { id: 'electrical', name: '⚡ Electrical Knowledge', questions: 15, time: '15 min', category: 'Home Services' },
+  { id: 'carpentry', name: '🪚 Carpentry Skills', questions: 12, time: '12 min', category: 'Home Services' },
+  
+  // Languages
   { id: 'english', name: '📝 English Communication', questions: 20, time: '20 min', category: 'Language' },
+  { id: 'spanish', name: '📝 Spanish (Español)', questions: 20, time: '20 min', category: 'Language' },
+  { id: 'french', name: '📝 French (Français)', questions: 20, time: '20 min', category: 'Language' },
+  { id: 'arabic', name: '📝 Arabic (العربية)', questions: 20, time: '20 min', category: 'Language' },
+  { id: 'portuguese', name: '📝 Portuguese (Português)', questions: 20, time: '20 min', category: 'Language' },
+  { id: 'mandarin', name: '📝 Mandarin Chinese', questions: 20, time: '20 min', category: 'Language' },
+  { id: 'japanese', name: '📝 Japanese (日本語)', questions: 20, time: '20 min', category: 'Language' },
   { id: 'hindi', name: '📝 Hindi Communication', questions: 20, time: '20 min', category: 'Language' },
+  
+  // Software & Tech
   { id: 'excel', name: '📊 MS Excel', questions: 15, time: '15 min', category: 'Software' },
   { id: 'typing', name: '⌨️ Typing Speed', questions: 1, time: '5 min', category: 'Software' },
+  { id: 'web-dev', name: '💻 Web Development', questions: 20, time: '20 min', category: 'Software' },
+  { id: 'python', name: '🐍 Python Programming', questions: 15, time: '15 min', category: 'Software' },
+  { id: 'graphic-design', name: '🎨 Graphic Design', questions: 15, time: '15 min', category: 'Software' },
+  { id: 'video-editing', name: '🎥 Video Editing', questions: 12, time: '12 min', category: 'Software' },
+  { id: 'seo', name: '🔍 SEO Basics', questions: 15, time: '15 min', category: 'Software' },
+  
+  // Personal Services
   { id: 'cooking', name: '🍳 Cooking Basics', questions: 10, time: '10 min', category: 'Personal Services' },
   { id: 'driving', name: '🚗 Driving Knowledge', questions: 15, time: '15 min', category: 'Transport' },
+  { id: 'fitness', name: '💪 Fitness Training', questions: 12, time: '12 min', category: 'Personal Services' },
+  { id: 'beauty', name: '💇 Beauty & Salon', questions: 10, time: '10 min', category: 'Personal Services' },
+  { id: 'photography', name: '📸 Photography Basics', questions: 12, time: '12 min', category: 'Personal Services' },
+  
+  // Business
+  { id: 'customer-service', name: '🎧 Customer Service', questions: 15, time: '15 min', category: 'Business' },
+  { id: 'sales', name: '💼 Sales Skills', questions: 15, time: '15 min', category: 'Business' },
+  { id: 'accounting', name: '📋 Basic Accounting', questions: 15, time: '15 min', category: 'Business' },
 ];
 
 export default function SkillsPage() {
