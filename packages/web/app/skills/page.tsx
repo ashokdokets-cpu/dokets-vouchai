@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Award, CheckCircle, Star, TrendingUp, ArrowRight, Clock, X } from 'lucide-react';
 
+
 const QUESTIONS: Record<string, { q: string; options: string[]; answer: number }[]> = {
   english: [
     { q: 'What is the correct spelling?', options: ['Recieve', 'Receive', 'Recive', 'Receeve'], answer: 1 },
@@ -39,6 +40,9 @@ export default function SkillsPage() {
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [answers, setAnswers] = useState<number[]>([]);
+  const [customSkill, setCustomSkill] = useState('');
+  const [customQuestions, setCustomQuestions] = useState<any[]>([]);
+  const [loadingTest, setLoadingTest] = useState(false);
 
   const skillTests = [
     { id: 'english', name: '📝 English', questions: 5, time: '5 min', category: 'Language' },
@@ -68,7 +72,24 @@ export default function SkillsPage() {
     setShowResult(false);
   };
 
-  const questions = QUESTIONS[activeTest || ''] || DEFAULT_QUESTIONS;
+const startCustomTest = async () => {
+  if (!customSkill.trim()) return;
+  setLoadingTest(true);
+  const res = await fetch('https://dokets-vouchai.onrender.com/api/ai-tests/generate-test', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ skill: customSkill.trim() })
+  });
+  const data = await res.json();
+  setCustomQuestions(data.questions);
+  setActiveTest('custom');
+  setCurrentQ(0);
+  setScore(0);
+  setAnswers([]);
+  setShowResult(false);
+  setLoadingTest(false);
+};
+
+  const questions = activeTest === 'custom' ? customQuestions : (QUESTIONS[activeTest || ''] || DEFAULT_QUESTIONS);
 
   const handleAnswer = (answerIndex: number) => {
     const newAnswers = [...answers, answerIndex];
@@ -176,6 +197,20 @@ export default function SkillsPage() {
 
         {/* Test Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+{/* Custom Skill Test */}
+<div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-2xl border-2 border-dashed border-blue-300 col-span-full mb-4">
+  <h3 className="font-semibold text-lg mb-2">✨ Custom Skill Test</h3>
+  <p className="text-sm text-gray-500 mb-3">Enter any skill and our AI will generate a test for you</p>
+  <div className="flex gap-2">
+    <input type="text" placeholder="e.g., Yoga Instruction, Drone Photography..." value={customSkill}
+      onChange={e => setCustomSkill(e.target.value)}
+      className="flex-1 px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+    <button onClick={startCustomTest} disabled={loadingTest || !customSkill.trim()}
+      className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 disabled:opacity-50 whitespace-nowrap">
+      {loadingTest ? 'Generating...' : 'Take Test'}
+    </button>
+  </div>
+</div>
           {skillTests.map(test => (
             <div key={test.id} className={`bg-white p-6 rounded-2xl border ${certified.includes(test.id) ? 'border-green-400 bg-green-50' : 'hover:border-blue-200'}`}>
               <div className="text-3xl mb-2">{test.name.split(' ')[0]}</div>
