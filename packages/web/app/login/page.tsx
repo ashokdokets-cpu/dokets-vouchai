@@ -18,39 +18,41 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleSendOTP = async () => {
-    if (!phone || phone.length < 10) return setError('Enter valid phone number');
-    setLoading(true);
-    setError('');
-    const result = await sendOTP(phone);
-    if (result) {
-      setOtpSent(result !== 'sent' ? result : '');
-      setStep('otp');
-    } else {
-      setError('Failed to send OTP. Try again.');
-    }
-    setLoading(false);
-  };
+  // Clean phone number - remove spaces, dashes
+  const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+  if (!cleanPhone || cleanPhone.length < 10) return setError('Enter valid phone number');
+  
+  setLoading(true);
+  setError('');
+  const result = await sendOTP(cleanPhone);
+  if (result) {
+    setOtpSent(result !== 'sent' ? result : '');
+    setStep('otp');
+  } else {
+    setError('Failed to send OTP. Try again.');
+  }
+  setLoading(false);
+};
 
   const handleVerifyOTP = async () => {
-    if (!code || code.length !== 6) return setError('Enter 6-digit code');
-    setLoading(true);
-    setError('');
-    const success = await verifyOTP(phone, code);
-    if (success) {
-      // Check if user has auto-generated name
-      const res = await fetch('https://dokets-vouchai.onrender.com/api/users/phone/' + phone);
-      const userData = await res.json();
-      setUserId(userData.id);
-      if (userData.name && userData.name.startsWith('User')) {
-        setStep('name');
-      } else {
-        router.push('/dashboard/client');
-      }
+  if (!code || code.length !== 6) return setError('Enter 6-digit code');
+  setLoading(true);
+  setError('');
+  const success = await verifyOTP(cleanPhone, code);
+  if (success) {
+    const res = await fetch('https://dokets-vouchai.onrender.com/api/users/phone/' + cleanPhone);
+    const userData = await res.json();
+    setUserId(userData.id);
+    if (userData.name && userData.name.startsWith('User')) {
+      setStep('name');
     } else {
-      setError('Invalid or expired code. Try again.');
+      router.push('/dashboard/client');
     }
-    setLoading(false);
-  };
+  } else {
+    setError('Invalid or expired code. Try again.');
+  }
+  setLoading(false);
+};
 
   const handleSaveName = async () => {
     if (!userName.trim()) return setError('Please enter your name');
