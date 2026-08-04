@@ -6,14 +6,43 @@ import Link from 'next/link';
 import { Search, Star, Shield, ArrowRight } from 'lucide-react';
 
 const CATEGORIES = [
+  // Home Services
   { id: 'painting', icon: '🎨', name: 'Painting', desc: 'Interior & exterior painting', count: '2,450 providers' },
   { id: 'plumbing', icon: '🔧', name: 'Plumbing', desc: 'Pipe repairs & installation', count: '1,890 providers' },
   { id: 'electrical', icon: '⚡', name: 'Electrical', desc: 'Wiring, fixtures & repairs', count: '3,100 providers' },
   { id: 'cleaning', icon: '🧹', name: 'Cleaning', desc: 'Home & office cleaning', count: '5,200 providers' },
   { id: 'carpentry', icon: '🪚', name: 'Carpentry', desc: 'Furniture & woodwork', count: '980 providers' },
-  { id: 'tutoring', icon: '📚', name: 'Tutoring', desc: 'Academic & skill tutoring', count: '4,300 providers' },
-  { id: 'photography', icon: '📸', name: 'Photography', desc: 'Events & portraits', count: '1,650 providers' },
+  { id: 'roofing', icon: '🏗️', name: 'Roofing', desc: 'Roof repair & installation', count: '650 providers' },
+  { id: 'landscaping', icon: '🌳', name: 'Landscaping', desc: 'Garden & outdoor design', count: '1,200 providers' },
+  
+  // Tech & Digital
   { id: 'development', icon: '💻', name: 'Development', desc: 'Web & app development', count: '2,800 providers' },
+  { id: 'design', icon: '🎨', name: 'Design', desc: 'Graphic & UI/UX design', count: '3,400 providers' },
+  { id: 'writing', icon: '✍️', name: 'Writing', desc: 'Content & copywriting', count: '4,100 providers' },
+  { id: 'video', icon: '🎥', name: 'Video Editing', desc: 'Video production & editing', count: '1,900 providers' },
+  { id: 'seo', icon: '🔍', name: 'SEO & Marketing', desc: 'Digital marketing services', count: '2,300 providers' },
+  { id: 'data', icon: '📊', name: 'Data Entry', desc: 'Data processing & analysis', count: '5,500 providers' },
+  
+  // Education
+  { id: 'tutoring', icon: '📚', name: 'Tutoring', desc: 'Academic & skill tutoring', count: '4,300 providers' },
+  { id: 'language', icon: '🗣️', name: 'Language Lessons', desc: 'Learn any language', count: '2,100 providers' },
+  { id: 'music', icon: '🎵', name: 'Music Lessons', desc: 'Instruments & vocals', count: '1,500 providers' },
+  
+  // Personal Services
+  { id: 'beauty', icon: '💇', name: 'Beauty & Salon', desc: 'Hair, makeup & skincare', count: '3,800 providers' },
+  { id: 'fitness', icon: '💪', name: 'Fitness Training', desc: 'Personal & group training', count: '2,600 providers' },
+  { id: 'cooking', icon: '🍳', name: 'Cooking & Catering', desc: 'Meal prep & event catering', count: '1,700 providers' },
+  { id: 'driving', icon: '🚗', name: 'Driving', desc: 'Personal & commercial driving', count: '1,400 providers' },
+  { id: 'photography', icon: '📸', name: 'Photography', desc: 'Events & portraits', count: '1,650 providers' },
+  
+  // Business
+  { id: 'legal', icon: '⚖️', name: 'Legal Services', desc: 'Document review & advice', count: '890 providers' },
+  { id: 'accounting', icon: '📋', name: 'Accounting', desc: 'Bookkeeping & tax prep', count: '1,200 providers' },
+  { id: 'translation', icon: '🌐', name: 'Translation', desc: 'Document & live translation', count: '2,400 providers' },
+  { id: 'virtual-assistant', icon: '👩‍💼', name: 'Virtual Assistant', desc: 'Admin & personal assistance', count: '3,100 providers' },
+  
+  // Custom
+  { id: 'custom', icon: '✨', name: 'Custom Service', desc: 'Any other service you need', count: 'Unlimited providers' },
 ];
 
 export default function ServicesPage() {
@@ -24,7 +53,7 @@ export default function ServicesPage() {
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-6 py-12">
           <h1 className="text-3xl font-bold text-gray-900">Find Services</h1>
-          <p className="text-gray-500 mt-2">Browse trusted providers for any job</p>
+          <p className="text-gray-500 mt-2">Browse 25+ service categories with trusted providers worldwide</p>
           <div className="relative mt-6 max-w-md">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input type="text" placeholder="Search services..." value={search}
