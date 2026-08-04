@@ -21,7 +21,6 @@ export default function LoginPage() {
   // Clean phone number - remove spaces, dashes
   const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
   if (!cleanPhone || cleanPhone.length < 10) return setError('Enter valid phone number');
-  
   setLoading(true);
   setError('');
   const result = await sendOTP(cleanPhone);
@@ -35,6 +34,7 @@ export default function LoginPage() {
 };
 
   const handleVerifyOTP = async () => {
+  const cleaned = phone.replace(/[\s\-\(\)]/g, '');
   if (!code || code.length !== 6) return setError('Enter 6-digit code');
   setLoading(true);
   setError('');
