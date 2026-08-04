@@ -22,6 +22,7 @@ import payoutRoutes from './routes/payouts';
 import razorpayPayoutRoutes from './routes/razorpay-payout';
 import razorpayWebhookRoutes from './routes/razorpay-webhook';
 import aiTestRoutes from './routes/ai-tests';
+import searchRoutes from './routes/search';
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -259,5 +260,6 @@ app.use('/api/payouts', payoutRoutes);
 app.use('/api/razorpay', razorpayPayoutRoutes);
 app.use('/api/razorpay', razorpayWebhookRoutes);
 app.use('/api/ai-tests', aiTestRoutes);
+app.use('/api/search', searchRoutes);
 
 app.listen(PORT, () => console.log('VouchAI running on port ' + PORT));

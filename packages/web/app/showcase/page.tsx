@@ -24,27 +24,20 @@ export default function ShowcasePage() {
   const [providers, setProviders] = useState<any[]>([]);
 
   useEffect(() => {
-    // Try to get real users, fallback to sample data
-    fetch('https://dokets-vouchai.onrender.com/api/users/phone/+919100014859')
-      .then(r => r.json()).then(user => {
-        if (user.id) {
-          // Get contracts to find providers
-          fetch('https://dokets-vouchai.onrender.com/api/jobs')
-            .then(r => r.json()).then(jobs => {
-              if (Array.isArray(jobs) && jobs.length > 0) {
-                const providers = jobs.filter((j: any) => j.provider).map((j: any) => ({
-                  id: j.provider?.id || j.id,
-                  name: j.provider?.name || 'Provider',
-                  vouchScore: j.provider?.vouchScore || 100,
-                  title: j.title,
-                  location: j.location || 'Global'
-                }));
-                setProviders(providers.slice(0, 12));
-              }
-            }).catch(() => setProviders(getSampleProviders()));
-        }
-      }).catch(() => setProviders(getSampleProviders()));
-  }, []);
+    if (search.length >= 2) {
+      // Real search via API
+      fetch(`https://dokets-vouchai.onrender.com/api/search?q=${encodeURIComponent(search)}`)
+        .then(r => r.json()).then(data => {
+          if (data.providers?.length > 0 || data.users?.length > 0) {
+            const allResults = [...(data.providers || []), ...(data.users || [])];
+            setProviders(allResults.slice(0, 20));
+          }
+        }).catch(() => {});
+    } else {
+      // Default: load sample providers
+      setProviders(getSampleProviders());
+    }
+  }, [search]);
 
   const tags = ['All', 'Development', 'Design', 'Writing', 'Marketing', 'Music', 'Education', 'Health', 'Home Services', 'Custom'];
 
