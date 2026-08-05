@@ -22,13 +22,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <head>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-7574958561"></script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-3CG9X7GBJ6"></script>
         <script dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-7574958561');
+            gtag('config', 'G-3CG9X7GBJ6');
           `
         }} />
       </head>
