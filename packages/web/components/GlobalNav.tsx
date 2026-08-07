@@ -22,6 +22,18 @@ export default function GlobalNav() {
   const [moreOpen, setMoreOpen] = useState(false);
   const { currency, setCurrency } = useCurrency();
 
+const handleCountryChange = (country: string) => {
+  const countryCurrencyMap: Record<string, string> = {
+    IN: 'INR', US: 'USD', GB: 'GBP', AE: 'AED', SA: 'SAR', SG: 'SGD',
+    JP: 'JPY', CN: 'CNY', KR: 'KRW', ID: 'IDR', TH: 'THB', PH: 'PHP',
+    VN: 'VND', AU: 'AUD', NZ: 'NZD', BR: 'BRL', MX: 'MXN', AR: 'ARS',
+    CA: 'CAD', NG: 'NGN', KE: 'KES', ZA: 'ZAR', EG: 'EGP',
+    DE: 'EUR', FR: 'EUR', ES: 'EUR'
+  };
+  const autoCurrency = countryCurrencyMap[country];
+  if (autoCurrency) setCurrency(autoCurrency);
+};
+
   const isActive = (href: string) => pathname === href || pathname?.startsWith(href + '/');
 
   const mainMenu = role === 'client' ? [
@@ -108,16 +120,22 @@ export default function GlobalNav() {
           <div className="flex items-center gap-2">
             {/* Country/Currency */}
 <div className="hidden lg:flex items-center gap-1">
-  <select className="text-xs bg-gray-50 border rounded px-1.5 py-1">
-  <option>🇮🇳 IN</option><option>🇺🇸 US</option><option>🇬🇧 UK</option>
-  <option>🇦🇪 UAE</option><option>🇸🇦 SA</option><option>🇸🇬 SG</option>
-  <option>🇯🇵 JP</option><option>🇨🇳 CN</option><option>🇰🇷 KR</option>
-  <option>🇮🇩 ID</option><option>🇹🇭 TH</option><option>🇵🇭 PH</option>
-  <option>🇻🇳 VN</option><option>🇦🇺 AU</option><option>🇳🇿 NZ</option>
-  <option>🇧🇷 BR</option><option>🇲🇽 MX</option><option>🇦🇷 AR</option>
-  <option>🇨🇦 CA</option><option>🇳🇬 NG</option><option>🇰🇪 KE</option>
-  <option>🇿🇦 ZA</option><option>🇪🇬 EG</option><option>🇩🇪 DE</option>
-  <option>🇫🇷 FR</option><option>🇪🇸 ES</option>
+  <select onChange={e => handleCountryChange(e.target.value)}
+  className="text-xs bg-gray-50 border rounded px-1.5 py-1">
+  <option value="IN">🇮🇳 IN</option><option value="US">🇺🇸 US</option>
+  <option value="GB">🇬🇧 UK</option><option value="AE">🇦🇪 UAE</option>
+  <option value="SA">🇸🇦 SA</option><option value="SG">🇸🇬 SG</option>
+  <option value="JP">🇯🇵 JP</option><option value="CN">🇨🇳 CN</option>
+  <option value="KR">🇰🇷 KR</option><option value="ID">🇮🇩 ID</option>
+  <option value="TH">🇹🇭 TH</option><option value="PH">🇵🇭 PH</option>
+  <option value="VN">🇻🇳 VN</option><option value="AU">🇦🇺 AU</option>
+  <option value="NZ">🇳🇿 NZ</option>
+  <option value="BR">🇧🇷 BR</option><option value="MX">🇲🇽 MX</option>
+  <option value="AR">🇦🇷 AR</option><option value="CA">🇨🇦 CA</option>
+  <option value="NG">🇳🇬 NG</option><option value="KE">🇰🇪 KE</option>
+  <option value="ZA">🇿🇦 ZA</option><option value="EG">🇪🇬 EG</option>
+  <option value="DE">🇩🇪 DE</option><option value="FR">🇫🇷 FR</option>
+  <option value="ES">🇪🇸 ES</option>
 </select>
   <select value={currency} onChange={e => setCurrency(e.target.value)}
   className="text-xs bg-gray-50 border rounded px-1.5 py-1">
