@@ -11,6 +11,7 @@ import {
   LogOut, ClipboardList, FileText, Award, Briefcase, CheckCircle, 
   ChevronDown, Globe, HelpCircle, MessageCircle, Crown
 } from 'lucide-react';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function GlobalNav() {
   const { user, logout } = useAuth();
@@ -19,6 +20,7 @@ export default function GlobalNav() {
   const [open, setOpen] = useState(false);
   const [role, setRole] = useState<'client' | 'provider'>('client');
   const [moreOpen, setMoreOpen] = useState(false);
+  const { currency, setCurrency } = useCurrency();
 
   const isActive = (href: string) => pathname === href || pathname?.startsWith(href + '/');
 
@@ -117,16 +119,33 @@ export default function GlobalNav() {
   <option>🇿🇦 ZA</option><option>🇪🇬 EG</option><option>🇩🇪 DE</option>
   <option>🇫🇷 FR</option><option>🇪🇸 ES</option>
 </select>
-  <select className="text-xs bg-gray-50 border rounded px-1.5 py-1">
-    <option>₹ INR</option><option>$ USD</option><option>€ EUR</option>
-    <option>£ GBP</option><option>¥ JPY</option><option>A$ AUD</option>
-    <option>C$ CAD</option><option>S$ SGD</option><option>R$ BRL</option>
-    <option>د.إ AED</option><option>﷼ SAR</option><option>Mex$ MXN</option>
-    <option>₦ NGN</option><option>KSh KES</option><option>R ZAR</option>
-    <option>E£ EGP</option><option>¥ CNY</option><option>₩ KRW</option>
-    <option>Rp IDR</option><option>₱ PHP</option><option>₫ VND</option>
-    <option>฿ THB</option><option>NZ$ NZD</option><option>AR$ ARS</option>
-  </select>
+  <select value={currency} onChange={e => setCurrency(e.target.value)}
+  className="text-xs bg-gray-50 border rounded px-1.5 py-1">
+  <option value="INR">₹ INR</option>
+  <option value="USD">$ USD</option>
+  <option value="EUR">€ EUR</option>
+  <option value="GBP">£ GBP</option>
+  <option value="JPY">¥ JPY</option>
+  <option value="AUD">A$ AUD</option>
+  <option value="CAD">C$ CAD</option>
+  <option value="SGD">S$ SGD</option>
+  <option value="AED">د.إ AED</option>
+  <option value="SAR">﷼ SAR</option>
+  <option value="BRL">R$ BRL</option>
+  <option value="MXN">Mex$ MXN</option>
+  <option value="NGN">₦ NGN</option>
+  <option value="KES">KSh KES</option>
+  <option value="ZAR">R ZAR</option>
+  <option value="EGP">E£ EGP</option>
+  <option value="CNY">¥ CNY</option>
+  <option value="KRW">₩ KRW</option>
+  <option value="IDR">Rp IDR</option>
+  <option value="PHP">₱ PHP</option>
+  <option value="VND">₫ VND</option>
+  <option value="THB">฿ THB</option>
+  <option value="NZD">NZ$ NZD</option>
+  <option value="ARS">AR$ ARS</option>
+</select>
 </div>
 
             {user ? (

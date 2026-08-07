@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import GlobalNav from "@/components/GlobalNav";
+import { CurrencyProvider } from "@/context/CurrencyContext";
 
 export const metadata: Metadata = {
   title: "Dokets VouchAI - Trust in Every Deal | AI Micro-Escrow Platform",
@@ -34,8 +35,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="antialiased">
         <AuthProvider>
-          <GlobalNav />
-          {children}
+          <CurrencyProvider>
+            <GlobalNav />
+            {children}
+          </CurrencyProvider>
         </AuthProvider>
       </body>
     </html>

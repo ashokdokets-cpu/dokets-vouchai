@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Star, Crown, Shield, Zap } from 'lucide-react';
 import Link from 'next/link';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function FeaturedPage() {
   const [providers, setProviders] = useState<any[]>([]);
@@ -36,7 +37,7 @@ function detectCurrency(): string {
   };
   return countryMap[country] || 'USD';
 }
-const currency = detectCurrency();
+const { currency } = useCurrency();
 const prices = PRICING[currency] || PRICING['default'];
 
   useEffect(() => {
