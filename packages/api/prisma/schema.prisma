@@ -19,6 +19,9 @@ model User {
   vouchScore    Float    @default(100)
   vouchTier     String   @default("NEW")
   isPremium     Boolean  @default(false)
+  premiumExpiry DateTime?
+  isFeatured    Boolean  @default(false)
+  featuredExpiry DateTime?
   referralCode  String   @unique
   walletBalance Float    @default(0)
   walletCurrency String  @default("INR")
@@ -30,6 +33,7 @@ model User {
 
   contractsAsClient  Contract[] @relation("ClientContracts")
   contractsAsProvider Contract[] @relation("ProviderContracts")
+  achievements  UserAchievement[]
 }
 
 model Contract {
@@ -120,4 +124,17 @@ model Dispute {
   resolvedAt  DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+model UserAchievement {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement String
+  name        String
+  description String
+  points      Int
+  icon        String?
+  awardedAt   DateTime @default(now())
+
+  @@unique([userId, achievement])
 }
