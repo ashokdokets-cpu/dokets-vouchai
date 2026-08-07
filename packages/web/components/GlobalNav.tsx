@@ -9,7 +9,7 @@ import {
   Shield, Menu, X, LayoutDashboard, Search, 
   PlusCircle, DollarSign, Star, User, Settings, Bell, 
   LogOut, ClipboardList, FileText, Award, Briefcase, CheckCircle, 
-  ChevronDown, Globe, HelpCircle, MessageCircle
+  ChevronDown, Globe, HelpCircle, MessageCircle, Crown
 } from 'lucide-react';
 
 export default function GlobalNav() {
