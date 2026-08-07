@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { Globe, Bell, Lock, Moon, DollarSign, CheckCircle } from 'lucide-react';
+import { Globe, Bell, Lock, Moon, DollarSign, CheckCircle, Crown  } from 'lucide-react';
+import { useCurrency } from '@/context/CurrencyContext';
 
 const LANGUAGES = [
   { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -56,6 +57,7 @@ export default function SettingsPage() {
   const [currency, setCurrency] = useState('INR');
   const [notifications, setNotifications] = useState(true);
   const [saved, setSaved] = useState(false);
+  const { currency: globalCurrency, symbol } = useCurrency();
 
   useEffect(() => {
     if (!user && !loading) router.push('/login');
@@ -85,6 +87,18 @@ export default function SettingsPage() {
       alert('Failed to save settings');
     }
   };
+
+const handleBoost = async (plan: string) => {
+  const res = await fetch('https://dokets-vouchai.onrender.com/api/featured/boost', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId: user.id, plan })
+  });
+  const data = await res.json();
+  if (data.success) {
+    alert('Profile boosted! You are now featured.');
+    window.location.reload();
+  }
+};
 
   if (loading || !user) return <div className="p-8 text-center">Loading...</div>;
 
@@ -150,6 +164,36 @@ export default function SettingsPage() {
               <a href="/terms" className="text-blue-600 hover:underline">Terms & Conditions</a>
             </div>
           </div>
+
+{/* Boost Profile Section */}
+<div className="bg-white rounded-2xl p-6 border">
+  <div className="flex items-center gap-3 mb-4">
+    <Crown className="w-5 h-5 text-yellow-500" />
+    <h2 className="font-semibold">Boost Your Profile</h2>
+  </div>
+  <p className="text-sm text-gray-500 mb-4">Get featured at the top of search results and get 5x more job invites</p>
+  <div className="grid grid-cols-3 gap-3 mb-4">
+    {[
+      { plan: 'weekly', price: '$5', days: '7 days', boost: '1.5x visibility' },
+      { plan: 'monthly', price: '$10', days: '30 days', boost: '3x visibility' },
+      { plan: 'quarterly', price: '$25', days: '90 days', boost: '5x visibility' },
+    ].map(p => (
+      <button key={p.plan} onClick={() => handleBoost(p.plan)}
+        className="p-3 rounded-xl border text-center hover:border-yellow-400 transition-all">
+        <div className="font-bold">{p.price}</div>
+        <div className="text-xs text-gray-500">{p.days}</div>
+        <div className="text-xs text-yellow-600 mt-1">{p.boost}</div>
+      </button>
+    ))}
+  </div>
+  {user.isFeatured ? (
+    <div className="bg-green-50 text-green-700 p-3 rounded-xl text-sm text-center">
+      ✅ Your profile is boosted! Expires: {new Date(user.featuredExpiry).toLocaleDateString()}
+    </div>
+  ) : (
+    <p className="text-xs text-gray-400 text-center">Select a plan to boost your profile</p>
+  )}
+</div>
 
           {/* Save Button */}
           <button onClick={handleSave}
