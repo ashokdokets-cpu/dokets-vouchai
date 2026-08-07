@@ -45,6 +45,7 @@ export default function GlobalNav() {
     { label: 'Settings', href: '/settings', icon: <Settings className="w-4 h-4" /> },
     { label: 'FAQ', href: '/faq', icon: <HelpCircle className="w-4 h-4" /> },
     { label: 'Help', href: '/help', icon: <MessageCircle className="w-4 h-4" /> },
+    { label: 'Featured', href: '/featured', icon: <Crown className="w-4 h-4" /> },
   ];
 
   return (
