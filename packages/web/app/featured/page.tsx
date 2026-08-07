@@ -45,7 +45,7 @@ const prices = PRICING[currency] || PRICING['default'];
       <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Boost CTA */}
         <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-8 mb-8 text-center border-2 border-dashed border-yellow-300">
-          <h2 className="text-2xl font-bold mb-2">🚀 Boost Your Profile</h2>
+          <h2 className="text-2xl font-bold mb-2">🚀 Boost Your Profile Worldwide</h2>
           <p className="text-gray-600 mb-4">Get 5x more job invites by appearing at the top</p>
           <div className="flex justify-center gap-4 mb-6">
             {[
