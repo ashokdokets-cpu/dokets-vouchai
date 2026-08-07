@@ -23,20 +23,7 @@ const PRICING: Record<string, { weekly: string; monthly: string; quarterly: stri
   default: { weekly: '$5', monthly: '$10', quarterly: '$25', symbol: '$' }
 };
 
-// Detect currency from browser locale
-function detectCurrency(): string {
-  if (typeof navigator === 'undefined') return 'USD';
-  const lang = navigator.language || 'en-US';
-  const country = lang.split('-')[1] || 'US';
-  const countryMap: Record<string, string> = {
-    IN: 'INR', US: 'USD', GB: 'GBP', DE: 'EUR', FR: 'EUR', ES: 'EUR', IT: 'EUR',
-    JP: 'JPY', AU: 'AUD', CA: 'CAD', SG: 'SGD', AE: 'AED', SA: 'SAR',
-    BR: 'BRL', MX: 'MXN', NG: 'NGN', KE: 'KES', ZA: 'ZAR', EG: 'EGP',
-    CN: 'CNY', KR: 'KRW', ID: 'IDR', PH: 'PHP', VN: 'VND', TH: 'THB',
-    NZ: 'NZD', AR: 'ARS'
-  };
-  return countryMap[country] || 'USD';
-}
+
 const { currency } = useCurrency();
 const prices = PRICING[currency] || PRICING['default'];
 

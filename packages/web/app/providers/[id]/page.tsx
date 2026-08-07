@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Star, Shield, Award, Briefcase, MapPin, CheckCircle, Camera, MessageCircle } from 'lucide-react';
 
 export default function ProviderProfilePage() {
@@ -9,6 +9,7 @@ export default function ProviderProfilePage() {
   const [provider, setProvider] = useState<any>(null);
   const [portfolio, setPortfolio] = useState<any[]>([]);
   const [reviews, setReviews] = useState<any[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     fetch('https://dokets-vouchai.onrender.com/api/users/' + id)
@@ -97,10 +98,12 @@ export default function ProviderProfilePage() {
           </div>
         </div>
 
-        {/* Contact Button */}
-        <button className="w-full bg-blue-600 text-white py-4 rounded-2xl font-semibold text-lg hover:bg-blue-700 mt-8 flex items-center justify-center gap-2">
-          <MessageCircle className="w-5 h-5" /> Contact Provider
-        </button>
+        {/* Hire Button */}
+<button 
+  onClick={() => router.push(`/contracts/create?providerPhone=${provider.phone || ''}&providerName=${encodeURIComponent(provider.name || '')}`)}
+  className="w-full bg-blue-600 text-white py-4 rounded-2xl font-semibold text-lg hover:bg-blue-700 mt-8 flex items-center justify-center gap-2">
+  <Briefcase className="w-5 h-5" /> Hire {provider.name || 'Provider'}
+</button>
       </div>
     </div>
   );
