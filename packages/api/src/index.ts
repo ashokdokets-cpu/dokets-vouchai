@@ -25,6 +25,7 @@ import aiTestRoutes from './routes/ai-tests';
 import searchRoutes from './routes/search';
 import featuredRoutes from './routes/featured';
 import badgeRoutes from './routes/badges';
+import instaAssistRoutes from './routes/insta-assist';
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -265,5 +266,6 @@ app.use('/api/ai-tests', aiTestRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/featured', featuredRoutes);
 app.use('/api/badges', badgeRoutes);
+app.use('/api/insta-assist', instaAssistRoutes);
 
 app.listen(PORT, () => console.log('VouchAI running on port ' + PORT));

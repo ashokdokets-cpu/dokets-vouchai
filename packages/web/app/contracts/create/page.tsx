@@ -72,7 +72,7 @@ export default function CreateContractPage() {
     providerPhone: '', providerName: '',
     service: '', title: '', description: '',
     amount: '', currency: 'INR',
-    deadline: '', location: '', country: 'IN',
+    deadline: '', timeSlot: '', location: '', country: 'IN',
     customService: '',
   });
   const [contract, setContract] = useState<any>(null);
@@ -267,6 +267,12 @@ export default function CreateContractPage() {
                     <input type="datetime-local" value={form.deadline}
                       onChange={e => updateForm('deadline', e.target.value)}
                       className="w-full px-4 py-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-sm" />
+                      <option value="">Select time slot</option>
+                      <option value="morning">🌅 Morning (8 AM - 12 PM)</option>
+                      <option value="afternoon">☀️ Afternoon (12 PM - 4 PM)</option>
+                      <option value="evening">🌇 Evening (4 PM - 8 PM)</option>
+                      <option value="flexible">🕐 Flexible (Any time)</option>
+                    </select>
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-600 mb-1 block">Location</label>
